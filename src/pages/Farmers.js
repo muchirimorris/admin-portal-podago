@@ -18,6 +18,7 @@ function Farmers() {
   const [farmers, setFarmers] = useState([]);
 
   const [editingFarmer, setEditingFarmer] = useState(null);
+  const [showAddFarmerModal, setShowAddFarmerModal] = useState(false); // Added state
   const [formData, setFormData] = useState({ name: "", pin: "", email: "" });
 
   // 🔹 Fetch all farmers from Firestore
@@ -85,10 +86,11 @@ function Farmers() {
 
   return (
     <div className="farmers-page">
-      {/* 🔹 Farmers Section */}
-      <div className="header">
-        <h1>👨‍🌾 Farmers</h1>
-        <p>Manage all registered farmers in the system</p>
+      {/* 🔹 Header Section */}
+      <div className="header" style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem' }}>
+        <button className="add-btn" onClick={() => setShowAddFarmerModal(true)}>
+          ➕ Add Farmer
+        </button>
       </div>
 
       <div className="table-container">

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "./services/firebase";
-import Sidebar from "./components/Sidebar";
+import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Farmers from "./pages/Farmers";
 import Collectors from "./pages/Collectors";
@@ -14,7 +14,6 @@ import Login from "./components/Login";
 import "./App.css";
 
 function App() {
-  const [isOpen, setIsOpen] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -67,56 +66,47 @@ function App() {
   return (
     <Router>
       {isAuthenticated ? (
-        <>
-          <Sidebar
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
-            onLogout={handleLogout}
-            user={user}
-          />
-          <div className={`content ${isOpen ? "sidebar-open" : "sidebar-closed"}`}>
-            <Routes>
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <Dashboard user={user} />
-                </ProtectedRoute>
-              } />
-              <Route path="/farmers" element={
-                <ProtectedRoute>
-                  <Farmers />
-                </ProtectedRoute>
-              } />
-              <Route path="/collectors" element={
-                <ProtectedRoute>
-                  <Collectors />
-                </ProtectedRoute>
-              } />
-              <Route path="/milk-logs" element={
-                <ProtectedRoute>
-                  <MilkLogs />
-                </ProtectedRoute>
-              } />
-              <Route path="/payments" element={
-                <ProtectedRoute>
-                  <Payments />
-                </ProtectedRoute>
-              } />
-              <Route path="/analytics" element={
-                <ProtectedRoute>
-                  <Analytics />
-                </ProtectedRoute>
-              } />
-              {/* Add Feed Route */}
-              <Route path="/feeds" element={
-                <ProtectedRoute>
-                  <Feeds />
-                </ProtectedRoute>
-              } />
-              <Route path="/login" element={<Navigate to="/" />} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </div>
-        </>
+        <Layout user={user} onLogout={handleLogout}>
+          <Routes>
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Dashboard user={user} />
+              </ProtectedRoute>
+            } />
+            <Route path="/farmers" element={
+              <ProtectedRoute>
+                <Farmers />
+              </ProtectedRoute>
+            } />
+            <Route path="/collectors" element={
+              <ProtectedRoute>
+                <Collectors />
+              </ProtectedRoute>
+            } />
+            <Route path="/milk-logs" element={
+              <ProtectedRoute>
+                <MilkLogs />
+              </ProtectedRoute>
+            } />
+            <Route path="/payments" element={
+              <ProtectedRoute>
+                <Payments />
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            } />
+            <Route path="/feeds" element={
+              <ProtectedRoute>
+                <Feeds />
+              </ProtectedRoute>
+            } />
+            <Route path="/login" element={<Navigate to="/" />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Layout>
       ) : (
         <Routes>
           <Route path="/login" element={<Login onLogin={handleLogin} />} />

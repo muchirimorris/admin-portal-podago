@@ -1,11 +1,9 @@
 /* src/pages/Collectors.css */
 
 .collectors-page {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  background: #f8fafc;
-  min-height: 100vh;
+  /* padding handled by Layout content-wrapper */
+  background: transparent;
+  min-height: auto;
 }
 
 /* Header Section */
@@ -15,7 +13,8 @@
   border-radius: 12px;
   margin-bottom: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-left: 4px solid #2980b9; /* Changed to Blue for Collectors */
+  border-left: 4px solid #2980b9;
+  /* Changed to Blue for Collectors */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -40,23 +39,23 @@
 
 /* Add Button */
 .add-btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
 }
 
 .add-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
 }
 
 
@@ -105,7 +104,8 @@
 }
 
 /* Action Buttons */
-.edit-btn, .delete-btn {
+.edit-btn,
+.delete-btn {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
@@ -171,6 +171,7 @@
     opacity: 0;
     transform: translateY(-50px) scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -217,7 +218,8 @@
   margin-top: 2rem;
 }
 
-.save-btn, .cancel-btn {
+.save-btn,
+.cancel-btn {
   padding: 0.75rem 2rem;
   border: none;
   border-radius: 8px;

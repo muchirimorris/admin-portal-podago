@@ -6,18 +6,13 @@ import {
   FaUserFriends,
   FaTint,
   FaMoneyBillWave,
-  FaBars,
-  FaTimes,
-  FaSign,
-  FaSignOutAlt,
-  FaUser,
   FaChartLine,
   FaTruck
 } from "react-icons/fa";
-import "./Sidebar.css";
 import { FaBowlFood } from "react-icons/fa6";
+import "./Sidebar.css";
 
-function Sidebar({ isOpen, setIsOpen, onLogout, user }) {
+function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation();
 
   const menuItems = [
@@ -27,30 +22,17 @@ function Sidebar({ isOpen, setIsOpen, onLogout, user }) {
     { path: "/milk-logs", name: "Milk Logs", icon: <FaTint /> },
     { path: "/payments", name: "Payments", icon: <FaMoneyBillWave /> },
     { path: "/analytics", name: "Analytics", icon: <FaChartLine /> },
-    { path: "/feeds", name: "feeds", icon: <FaBowlFood /> },
+    { path: "/feeds", name: "Feeds", icon: <FaBowlFood /> },
   ];
 
   return (
     <>
-      {/* 🔹 Toggle Button stays always visible */}
-      <button className="toggle-btn" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? <FaTimes /> : <FaBars />}
-      </button>
-
       {/* 🔹 Sidebar slides in/out */}
       <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
-        {/* User Info Section */}
-        {user && isOpen && (
-          <div className="user-info">
-            <div className="user-avatar">
-              <FaUser />
-            </div>
-            <div className="user-details">
-              <div className="user-email">{user.email}</div>
-              <div className="user-role">Admin</div>
-            </div>
-          </div>
-        )}
+        {/* Logo / Brand Area */}
+        <div className="sidebar-header">
+          <h2 className="brand-logo">Podago</h2>
+        </div>
 
         {/* Navigation Menu */}
         <nav className="sidebar-nav">
@@ -66,16 +48,6 @@ function Sidebar({ isOpen, setIsOpen, onLogout, user }) {
             </Link>
           ))}
         </nav>
-
-        {/* Logout Button */}
-        {isOpen && (
-          <div className="sidebar-footer">
-            <button className="logout-btn" onClick={onLogout}>
-              <span className="icon"><FaSignOutAlt /></span>
-              <span className="label">Logout</span>
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Overlay for mobile when sidebar is open */}

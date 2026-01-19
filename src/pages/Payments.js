@@ -494,7 +494,6 @@ function Payments() {
 
   return (
     <div className="payments">
-      <h1>💰 Payments & Deductions</h1>
 
       {/* 🔹 Milk Price Configuration */}
       <div className="price-configuration">

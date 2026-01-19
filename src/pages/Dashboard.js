@@ -11,6 +11,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import {
+  FaFilter, // Added import
+} from "react-icons/fa";
 import "./Dashboard.css";
 
 function Dashboard() {
@@ -21,6 +24,7 @@ function Dashboard() {
   const [logs, setLogs] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [filter, setFilter] = useState("week"); // default filter
+  const [timeRange, setTimeRange] = useState("all"); // Added state
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +41,7 @@ function Dashboard() {
       const now = new Date();
       let startDate = new Date();
       let rangeDays = 7;
-      
+
       switch (filter) {
         case "today":
           rangeDays = 1;
@@ -68,10 +72,10 @@ function Dashboard() {
       allLogs.forEach((log) => {
         if (!log.date) return;
         const logDate = log.date.toDate();
-        
+
         // Check if log is within selected filter range
         const isInRange = logDate >= startDate && logDate <= now;
-        
+
         if (isInRange) {
           totalMilk += log.quantity ?? 0;
 
@@ -103,7 +107,7 @@ function Dashboard() {
 
       // ✅ Prepare chart data
       let chartRange = [];
-      
+
       if (filter === "today") {
         // Generate 24 hours for today
         chartRange = [...Array(24)].map((_, i) => {
@@ -121,13 +125,13 @@ function Dashboard() {
         // Generate actual dates for current month (e.g., "Jan 1", "Jan 2", etc.)
         const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
         const currentMonth = now.toLocaleDateString("en-US", { month: "short" });
-        
+
         chartRange = [...Array(daysInMonth)].map((_, i) => {
           const day = i + 1;
           const dateKey = `${currentMonth} ${day}`;
-          return { 
-            date: dateKey, 
-            liters: timeTotals[dateKey] ?? 0 
+          return {
+            date: dateKey,
+            liters: timeTotals[dateKey] ?? 0
           };
         });
       } else {
@@ -181,7 +185,7 @@ function Dashboard() {
   const getFilterIcon = (filterType) => {
     const icons = {
       today: "📅",
-      week: "📊", 
+      week: "📊",
       month: "🗓️",
       year: "📈"
     };
@@ -189,41 +193,42 @@ function Dashboard() {
   };
 
   return (
-    <div className="main-content">
-      {/* ✅ Top Bar */}
-      <div className="topbar">
-        <h1>🌿 Admin Dashboard</h1>
-        <div className="filters">
-          <button
-            className={filter === "today" ? "active" : ""}
-            onClick={() => setFilter("today")}
-          >
-            <span className="filter-icon">{getFilterIcon("today")}</span>
-            Today
-          </button>
-          <button
-            className={filter === "week" ? "active" : ""}
-            onClick={() => setFilter("week")}
-          >
-            <span className="filter-icon">{getFilterIcon("week")}</span>
-            This Week
-          </button>
-          <button
-            className={filter === "month" ? "active" : ""}
-            onClick={() => setFilter("month")}
-          >
-            <span className="filter-icon">{getFilterIcon("month")}</span>
-            This Month
-          </button>
-          <button
-            className={filter === "year" ? "active" : ""}
-            onClick={() => setFilter("year")}
-          >
-            <span className="filter-icon">{getFilterIcon("year")}</span>
-            This Year
-          </button>
-        </div>
+    <div className="dashboard-container">
+      {/* 🔹 Filters */}
+      <div className="filters">
+        <button onClick={() => setTimeRange("all")} className={timeRange === "all" ? "active" : ""}>
+          <FaFilter className="filter-icon" /> All Time
+        </button>
+        <button
+          className={filter === "today" ? "active" : ""}
+          onClick={() => setFilter("today")}
+        >
+          <span className="filter-icon">{getFilterIcon("today")}</span>
+          Today
+        </button>
+        <button
+          className={filter === "week" ? "active" : ""}
+          onClick={() => setFilter("week")}
+        >
+          <span className="filter-icon">{getFilterIcon("week")}</span>
+          This Week
+        </button>
+        <button
+          className={filter === "month" ? "active" : ""}
+          onClick={() => setFilter("month")}
+        >
+          <span className="filter-icon">{getFilterIcon("month")}</span>
+          This Month
+        </button>
+        <button
+          className={filter === "year" ? "active" : ""}
+          onClick={() => setFilter("year")}
+        >
+          <span className="filter-icon">{getFilterIcon("year")}</span>
+          This Year
+        </button>
       </div>
+
 
       {/* ✅ Chart */}
       <div className="chart-section">
@@ -235,12 +240,12 @@ function Dashboard() {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey={getDataKey()} 
+              <XAxis
+                dataKey={getDataKey()}
                 label={{ value: getChartLabel(), position: 'insideBottom', offset: -5 }}
               />
               <YAxis label={{ value: 'Liters', angle: -90, position: 'insideLeft' }} />
-              <Tooltip 
+              <Tooltip
                 formatter={(value) => [`${value} L`, 'Quantity']}
                 labelFormatter={formatTooltipLabel}
               />
@@ -301,9 +306,8 @@ function Dashboard() {
                   <td>{log.quantity}</td>
                   <td>
                     <span
-                      className={`status ${
-                        log.status === "paid" ? "paid" : "pending"
-                      }`}
+                      className={`status ${log.status === "paid" ? "paid" : "pending"
+                        }`}
                     >
                       {log.status}
                     </span>
@@ -315,7 +319,7 @@ function Dashboard() {
           </table>
         )}
       </div>
-    </div>
+    </div >
   );
 }
 

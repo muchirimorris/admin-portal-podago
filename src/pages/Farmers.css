@@ -1,11 +1,9 @@
 /* src/pages/Farmers.css */
 
 .farmers-page {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  background: #f8fafc;
-  min-height: 100vh;
+  /* padding handled by Layout content-wrapper */
+  background: transparent;
+  min-height: auto;
 }
 
 /* Header Section */
@@ -80,7 +78,8 @@
 }
 
 /* Action Buttons */
-.edit-btn, .delete-btn {
+.edit-btn,
+.delete-btn {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
@@ -146,6 +145,7 @@
     opacity: 0;
     transform: translateY(-50px) scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -192,7 +192,8 @@
   margin-top: 2rem;
 }
 
-.save-btn, .cancel-btn {
+.save-btn,
+.cancel-btn {
   padding: 0.75rem 2rem;
   border: none;
   border-radius: 8px;
@@ -266,8 +267,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Status Badges */
@@ -333,48 +339,49 @@
   .farmers-page {
     padding: 1rem;
   }
-  
+
   .header {
     padding: 1.5rem;
     text-align: center;
   }
-  
+
   .header h1 {
     font-size: 1.8rem;
   }
-  
+
   .table-container {
     overflow-x: auto;
   }
-  
+
   .farmers-table {
     min-width: 600px;
   }
-  
+
   .farmers-table th,
   .farmers-table td {
     padding: 1rem 0.5rem;
     font-size: 0.9rem;
   }
-  
+
   .modal {
     padding: 2rem;
     margin: 1rem;
   }
-  
+
   .modal-actions {
     flex-direction: column;
   }
-  
-  .save-btn, .cancel-btn {
+
+  .save-btn,
+  .cancel-btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .controls {
     flex-direction: column;
   }
-  
+
   .search-box {
     min-width: auto;
   }
@@ -384,16 +391,17 @@
   .header h1 {
     font-size: 1.5rem;
   }
-  
+
   .modal {
     padding: 1.5rem;
   }
-  
+
   .modal h2 {
     font-size: 1.5rem;
   }
-  
-  .edit-btn, .delete-btn {
+
+  .edit-btn,
+  .delete-btn {
     padding: 0.4rem 0.8rem;
     font-size: 0.8rem;
     margin-bottom: 0.3rem;
@@ -406,6 +414,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -416,10 +425,21 @@
   animation: fadeIn 0.3s ease;
 }
 
-.farmers-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
-.farmers-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
-.farmers-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
-.farmers-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+.farmers-table tbody tr:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.farmers-table tbody tr:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.farmers-table tbody tr:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.farmers-table tbody tr:nth-child(4) {
+  animation-delay: 0.4s;
+}
 
 /* Custom scrollbar for table */
 .table-container::-webkit-scrollbar {
@@ -446,16 +466,18 @@
     padding: 0;
     background: white;
   }
-  
-  .header, .table-container {
+
+  .header,
+  .table-container {
     box-shadow: none;
     border: 1px solid #ddd;
   }
-  
-  .edit-btn, .delete-btn {
+
+  .edit-btn,
+  .delete-btn {
     display: none;
   }
-  
+
   .modal-overlay {
     display: none;
   }

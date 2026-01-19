@@ -167,11 +167,7 @@ function Collectors() {
     return (
         <div className="collectors-page">
             {/* 🔹 Collectors Section */}
-            <div className="header">
-                <div>
-                    <h1>🚛 Collectors</h1>
-                    <p>Manage all registered milk collectors in the system</p>
-                </div>
+            <div className="header" style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem' }}>
                 <button className="add-btn" onClick={() => setShowAddCollectorModal(true)}>
                     ➕ Add Collector
                 </button>

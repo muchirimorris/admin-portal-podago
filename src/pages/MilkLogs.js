@@ -144,8 +144,6 @@ function MilkLogs() {
 
   return (
     <div className="milk-logs">
-      <h1>🥛 Milk Logs</h1>
-
       {/* 🔹 Filters */}
       <div className="filters">
         <select

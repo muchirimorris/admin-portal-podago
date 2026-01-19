@@ -1,33 +1,8 @@
 /* Dashboard.css */
-.main-content {
-  padding: 20px;
-  background-color: #f8f9fa;
-  min-height: 100vh;
+.dashboard-container {
+  /* padding is handled by Layout */
 }
 
-/* ✅ Top Bar with Teal Blue Gradient */
-.topbar {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
-  padding: 20px 30px;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.topbar h1 {
-  color: white;
-  margin: 0;
-  font-size: 28px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 
 /* ✅ Horizontal Filters */
 .filters {
@@ -264,38 +239,38 @@
   .main-content {
     padding: 15px;
   }
-  
+
   .topbar {
     padding: 15px 20px;
     flex-direction: column;
     align-items: stretch;
     background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
   }
-  
+
   .topbar h1 {
     font-size: 24px;
     text-align: center;
   }
-  
+
   .filters {
     justify-content: center;
   }
-  
+
   .filters button {
     min-width: 100px;
     padding: 10px 15px;
     font-size: 13px;
   }
-  
+
   .cards-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .chart-section,
   .recent-logs {
     padding: 20px;
   }
-  
+
   .recent-logs table {
     display: block;
     overflow-x: auto;
@@ -307,15 +282,15 @@
     flex-direction: column;
     width: 100%;
   }
-  
+
   .filters button {
     width: 100%;
   }
-  
+
   .card {
     padding: 20px;
   }
-  
+
   .card p {
     font-size: 28px;
   }
