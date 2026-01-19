@@ -26,6 +26,7 @@ function Payments() {
   const [statusFilter, setStatusFilter] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
+  const [dateRange, setDateRange] = useState({ start: "", end: "" }); // Added Date Range State
   const [paymentType, setPaymentType] = useState("all");
   const [isProcessing, setIsProcessing] = useState(false);
   const [pricePerLiter, setPricePerLiter] = useState(45);
@@ -69,7 +70,7 @@ function Payments() {
       alert('Price must be greater than 0');
       return;
     }
-    
+
     try {
       setPricePerLiter(newPrice);
       await saveMilkPriceToConfig(newPrice);
@@ -108,31 +109,45 @@ function Payments() {
     if (statusFilter) {
       q = query(q, where("status", "==", statusFilter));
     }
-    if (year) {
-      const start = new Date(year, 0, 1);
-      const end = new Date(year, 11, 31, 23, 59, 59);
-      q = query(q, where("date", ">=", start), where("date", "<=", end));
+    // 🔹 Date Filtering (Exclusive Priority: Range > Month/Year > Year)
+    let start, end;
+
+    if (dateRange.start && dateRange.end) {
+      // Date Range Priority
+      start = new Date(dateRange.start);
+      start.setHours(0, 0, 0, 0);
+
+      end = new Date(dateRange.end);
+      end.setHours(23, 59, 59, 999);
+    } else if (month) {
+      // Month Priority (Default to current year if year not selected)
+      const targetYear = year || new Date().getFullYear();
+      start = new Date(targetYear, month - 1, 1);
+      end = new Date(targetYear, month, 0, 23, 59, 59, 999);
+    } else if (year) {
+      // Year Priority
+      start = new Date(year, 0, 1);
+      end = new Date(year, 11, 31, 23, 59, 59, 999);
     }
-    if (month && year) {
-      const start = new Date(year, month - 1, 1);
-      const end = new Date(year, month, 0, 23, 59, 59);
+
+    if (start && end) {
       q = query(q, where("date", ">=", start), where("date", "<=", end));
     }
 
     const snapshot = await getDocs(q);
-    const milkLogs = snapshot.docs.map((doc) => ({ 
-      id: doc.id, 
+    const milkLogs = snapshot.docs.map((doc) => ({
+      id: doc.id,
       ...doc.data(),
       type: 'milk_payment',
       amount: (doc.data().quantity ?? 0) * pricePerLiter
     }));
-    
+
     setLogs(milkLogs);
   };
 
   // 🔹 Fetch feed deductions
   const fetchFeedDeductions = () => {
-    let q = query(collection(db, "payments"), 
+    let q = query(collection(db, "payments"),
       where("type", "==", "feed_deduction"),
       orderBy("createdAt", "desc")
     );
@@ -160,7 +175,17 @@ function Payments() {
     return () => {
       if (unsubscribe) unsubscribe();
     };
-  }, [selectedFarmer, statusFilter, month, year, pricePerLiter]);
+  }, [selectedFarmer, statusFilter, month, year, dateRange, pricePerLiter]);
+
+  // 🔹 Clear all filters
+  const clearFilters = () => {
+    setSelectedFarmer("");
+    setStatusFilter("");
+    setPaymentType("all");
+    setYear("");
+    setMonth("");
+    setDateRange({ start: "", end: "" });
+  };
 
   // 🔹 PROCESS PAYMENT: Mark milk as paid and clear balance
   const processPayment = async (farmerId) => {
@@ -178,7 +203,7 @@ function Payments() {
         where("farmerId", "==", farmerId),
         where("status", "==", "pending")
       );
-      
+
       const pendingMilkSnapshot = await getDocs(pendingMilkQuery);
       const pendingMilkLogs = pendingMilkSnapshot.docs;
 
@@ -195,7 +220,7 @@ function Payments() {
 
       // Get farmer's feed deductions
       const farmerDeductions = feedDeductions.filter(ded => ded.farmerId === farmerId);
-      const totalFeedDeductions = farmerDeductions.reduce((sum, ded) => 
+      const totalFeedDeductions = farmerDeductions.reduce((sum, ded) =>
         sum + Math.abs(ded.amount || 0), 0
       );
 
@@ -251,11 +276,11 @@ function Payments() {
       await batch.commit();
 
       alert(`✅ Payment processed successfully!\n\n` +
-            `📊 Pending Milk: KES ${totalPendingAmount}\n` +
-            `🌾 Feed Deductions: KES ${totalFeedDeductions}\n` +
-            `💰 Net Paid: KES ${netAmount}\n` +
-            `📈 Price per Liter: KES ${pricePerLiter}\n\n` +
-            `${pendingMilkLogs.length} milk deliveries marked as paid.`);
+        `📊 Pending Milk: KES ${totalPendingAmount}\n` +
+        `🌾 Feed Deductions: KES ${totalFeedDeductions}\n` +
+        `💰 Net Paid: KES ${netAmount}\n` +
+        `📈 Price per Liter: KES ${pricePerLiter}\n\n` +
+        `${pendingMilkLogs.length} milk deliveries marked as paid.`);
 
       // Refresh data
       fetchMilkPayments();
@@ -277,13 +302,13 @@ function Payments() {
 
       // Process each farmer
       for (const farmer of farmers) {
-        const farmerDeductions = feedDeductions.filter(ded => 
+        const farmerDeductions = feedDeductions.filter(ded =>
           ded.farmerId === farmer.id && ded.status !== 'processed'
         );
-        
+
         if (farmerDeductions.length === 0) continue;
 
-        const totalDeductions = farmerDeductions.reduce((sum, ded) => 
+        const totalDeductions = farmerDeductions.reduce((sum, ded) =>
           sum + Math.abs(ded.amount || 0), 0
         );
 
@@ -293,7 +318,7 @@ function Payments() {
           where("farmerId", "==", farmer.id),
           where("status", "==", "pending")
         );
-        
+
         const pendingMilkSnapshot = await getDocs(pendingMilkQuery);
         const pendingMilkLogs = pendingMilkSnapshot.docs;
 
@@ -306,7 +331,7 @@ function Payments() {
 
         // Calculate deduction amount (can't deduct more than pending)
         const deductionAmount = Math.min(totalDeductions, totalPending);
-        
+
         if (deductionAmount > 0) {
           const batch = writeBatch(db);
 
@@ -379,13 +404,13 @@ function Payments() {
 
   // 🔹 CALCULATE FARMER BALANCE
   const calculateFarmerBalance = (farmerId) => {
-    const farmerMilkPending = logs.filter(log => 
+    const farmerMilkPending = logs.filter(log =>
       log.farmerId === farmerId && log.status === "pending"
     );
-    const farmerMilkPaid = logs.filter(log => 
+    const farmerMilkPaid = logs.filter(log =>
       log.farmerId === farmerId && log.status === "paid"
     );
-    const farmerDeductions = feedDeductions.filter(ded => 
+    const farmerDeductions = feedDeductions.filter(ded =>
       ded.farmerId === farmerId && ded.status !== 'processed'
     );
 
@@ -413,7 +438,7 @@ function Payments() {
 
     const totalMilkPaid = milkPaid.reduce((sum, log) => sum + (log.amount || 0), 0);
     const totalMilkPending = milkPending.reduce((sum, log) => sum + (log.amount || 0), 0);
-    const totalFeedDeductions = activeDeductions.reduce((sum, deduction) => 
+    const totalFeedDeductions = activeDeductions.reduce((sum, deduction) =>
       sum + Math.abs(deduction.amount || 0), 0
     );
 
@@ -447,6 +472,26 @@ function Payments() {
     return true;
   });
 
+  // 🔹 Calculate Date Constraints for Picker
+  const getDateConstraints = () => {
+    if (!year && !month) return { min: undefined, max: undefined };
+
+    const targetYear = year || new Date().getFullYear();
+    // month is 1-12
+    const startMonthIndex = month ? parseInt(month) - 1 : 0;
+    const endMonthIndex = month ? parseInt(month) : 12;
+
+    const minD = new Date(targetYear, startMonthIndex, 1);
+    const maxD = new Date(targetYear, endMonthIndex, 0);
+
+    return {
+      min: format(minD, "yyyy-MM-dd"),
+      max: format(maxD, "yyyy-MM-dd"),
+    };
+  };
+
+  const { min: minDate, max: maxDate } = getDateConstraints();
+
   return (
     <div className="payments">
       <h1>💰 Payments & Deductions</h1>
@@ -455,14 +500,14 @@ function Payments() {
       <div className="price-configuration">
         <div className="price-header">
           <h3>📈 Milk Price Configuration</h3>
-          <button 
+          <button
             className="btn-toggle-price"
             onClick={() => setShowPriceInput(!showPriceInput)}
           >
             {showPriceInput ? '▼ Hide' : '⚙️ Configure Price'}
           </button>
         </div>
-        
+
         {showPriceInput && (
           <div className="price-input-section">
             <div className="price-input-group">
@@ -479,13 +524,13 @@ function Payments() {
               <span className="price-info">Current: KES {pricePerLiter} per liter</span>
             </div>
             <div className="price-actions">
-              <button 
+              <button
                 className="btn-apply-price"
                 onClick={() => updateMilkPrice(pricePerLiter)}
               >
                 Save Price
               </button>
-              <button 
+              <button
                 className="btn-reset-price"
                 onClick={() => updateMilkPrice(45)}
               >
@@ -502,9 +547,9 @@ function Payments() {
       {/* 🔹 Payment Processing Section */}
       <div className="payment-processing-section">
         <h3>💳 Payment Processing</h3>
-        
+
         <div className="processing-buttons">
-          <button 
+          <button
             className="btn-auto-deduct"
             onClick={autoDeductFeedCosts}
             disabled={feedDeductions.length === 0 || isProcessing}
@@ -515,7 +560,7 @@ function Payments() {
           {selectedFarmer && (() => {
             const balance = calculateFarmerBalance(selectedFarmer);
             return (
-              <button 
+              <button
                 className="btn-process-payment"
                 onClick={() => processPayment(selectedFarmer)}
                 disabled={!balance.hasPending || isProcessing}
@@ -587,7 +632,27 @@ function Payments() {
           ))}
         </select>
 
+        <input
+          type="date"
+          value={dateRange.start}
+          min={minDate}
+          max={maxDate}
+          onChange={(e) =>
+            setDateRange({ ...dateRange, start: e.target.value })
+          }
+        />
+        <input
+          type="date"
+          value={dateRange.end}
+          min={minDate}
+          max={maxDate}
+          onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+        />
+
         <button onClick={fetchMilkPayments}>Apply</button>
+        <button className="clear-btn" onClick={clearFilters} style={{ backgroundColor: "#e74c3c", color: "white" }}>
+          ✖ Clear
+        </button>
       </div>
 
       {/* 🔹 Financial Summary */}
@@ -649,12 +714,12 @@ function Payments() {
                   {farmers.find(f => f.id === transaction.farmerId)?.name || transaction.farmerId}
                 </td>
                 <td className="description">
-                  {transaction.type === 'feed_deduction' 
+                  {transaction.type === 'feed_deduction'
                     ? transaction.description || `Feed Purchase`
                     : `Milk Delivery: ${transaction.quantity}L @ KES ${pricePerLiter}/L`}
                 </td>
                 <td className={`amount-cell ${transaction.type === 'feed_deduction' ? 'deduction-amount' : 'payment-amount'}`}>
-                  {transaction.type === 'feed_deduction' 
+                  {transaction.type === 'feed_deduction'
                     ? `- KES ${Math.abs(transaction.amount || 0)}`
                     : `KES ${transaction.amount}`}
                 </td>
@@ -665,8 +730,8 @@ function Payments() {
                   {transaction.date?.toDate
                     ? format(transaction.date.toDate(), "MMM dd, yyyy")
                     : transaction.createdAt?.toDate
-                    ? format(transaction.createdAt.toDate(), "MMM dd, yyyy")
-                    : "N/A"}
+                      ? format(transaction.createdAt.toDate(), "MMM dd, yyyy")
+                      : "N/A"}
                 </td>
                 <td>
                   {transaction.type === 'milk_payment' && transaction.status === "pending" ? (
@@ -698,7 +763,7 @@ function Payments() {
         <div className="breakdown-cards">
           {farmers.filter(f => !selectedFarmer || f.id === selectedFarmer).map(farmer => {
             const balance = calculateFarmerBalance(farmer.id);
-            
+
             return (
               <div key={farmer.id} className="farmer-card">
                 <h4>{farmer.name || farmer.id}</h4>
@@ -711,7 +776,7 @@ function Payments() {
                   <div className="price-info">Price: KES {pricePerLiter}/L</div>
                 </div>
                 <div className="farmer-actions">
-                  <button 
+                  <button
                     onClick={() => processPayment(farmer.id)}
                     disabled={!balance.hasPending || isProcessing}
                     className="btn-pay-farmer"

@@ -33,32 +33,54 @@ function MilkLogs() {
 
   // 🔹 Fetch logs with filters
   const fetchLogs = async () => {
-    let q = query(collection(db, "milk_logs"), orderBy("date", "desc"));
+    let constraints = [];
 
+    // 1. Farmer Filter
     if (selectedFarmer) {
-      q = query(q, where("farmerId", "==", selectedFarmer));
+      constraints.push(where("farmerId", "==", selectedFarmer));
     }
 
-    if (year) {
-      const start = new Date(year, 0, 1);
-      const end = new Date(year, 11, 31, 23, 59, 59);
-      q = query(q, where("date", ">=", start), where("date", "<=", end));
-    }
-
-    if (month && year) {
-      const start = new Date(year, month - 1, 1);
-      const end = new Date(year, month, 0, 23, 59, 59);
-      q = query(q, where("date", ">=", start), where("date", "<=", end));
-    }
+    // 2. Date Filtering (Exclusive Priority: Range > Month/Year > Year)
+    let start, end;
 
     if (dateRange.start && dateRange.end) {
-      const start = new Date(dateRange.start);
-      const end = new Date(dateRange.end);
-      q = query(q, where("date", ">=", start), where("date", "<=", end));
+      // Date Range Priority
+      start = new Date(dateRange.start);
+      start.setHours(0, 0, 0, 0); // Start of day
+
+      end = new Date(dateRange.end);
+      end.setHours(23, 59, 59, 999); // End of day
+    } else if (month) {
+      // Month Priority (Default to current year if year not selected)
+      const targetYear = year || new Date().getFullYear();
+      start = new Date(targetYear, month - 1, 1);
+      end = new Date(targetYear, month, 0, 23, 59, 59, 999);
+    } else if (year) {
+      // Year Priority
+      start = new Date(year, 0, 1);
+      end = new Date(year, 11, 31, 23, 59, 59, 999);
     }
 
-    const snapshot = await getDocs(q);
-    setLogs(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    // Apply date constraints if calculated
+    if (start && end) {
+      constraints.push(where("date", ">=", start));
+      constraints.push(where("date", "<=", end));
+    }
+
+    // Combine with ordering
+    // Note: Firestore requires the field in 'where' to be the first in 'orderBy'
+    constraints.push(orderBy("date", "desc"));
+
+    const q = query(collection(db, "milk_logs"), ...constraints);
+
+    try {
+      const snapshot = await getDocs(q);
+      setLogs(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+      // Graceful fallback or alert if index is missing
+      alert("Error fetching logs. You may need to create a Firestore index.");
+    }
   };
 
   useEffect(() => {
@@ -66,11 +88,20 @@ function MilkLogs() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFarmer, year, month, dateRange]);
 
+  // 🔹 Clear all filters
+  const clearFilters = () => {
+    setSelectedFarmer("");
+    setYear("");
+    setMonth("");
+    setDateRange({ start: "", end: "" });
+  };
+
   // 🔹 Export to CSV
   const exportCSV = () => {
-    const header = ["Farmer", "Quantity", "Notes", "Status", "Date"];
+    const header = ["Farmer", "Collector", "Quantity", "Notes", "Status", "Date"];
     const rows = logs.map((log) => [
       log.farmerName || log.farmerId,
+      log.collectorName || "—",
       log.quantity,
       log.notes || "—",
       log.status,
@@ -90,6 +121,26 @@ function MilkLogs() {
     document.body.appendChild(link);
     link.click();
   };
+
+  // 🔹 Calculate Date Constraints for Picker
+  const getDateConstraints = () => {
+    if (!year && !month) return { min: undefined, max: undefined };
+
+    const targetYear = year || new Date().getFullYear();
+    // month is 1-12
+    const startMonthIndex = month ? parseInt(month) - 1 : 0;
+    const endMonthIndex = month ? parseInt(month) : 12;
+
+    const minD = new Date(targetYear, startMonthIndex, 1);
+    const maxD = new Date(targetYear, endMonthIndex, 0);
+
+    return {
+      min: format(minD, "yyyy-MM-dd"),
+      max: format(maxD, "yyyy-MM-dd"),
+    };
+  };
+
+  const { min: minDate, max: maxDate } = getDateConstraints();
 
   return (
     <div className="milk-logs">
@@ -128,6 +179,8 @@ function MilkLogs() {
         <input
           type="date"
           value={dateRange.start}
+          min={minDate}
+          max={maxDate}
           onChange={(e) =>
             setDateRange({ ...dateRange, start: e.target.value })
           }
@@ -135,10 +188,15 @@ function MilkLogs() {
         <input
           type="date"
           value={dateRange.end}
+          min={minDate}
+          max={maxDate}
           onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
         />
 
         <button onClick={fetchLogs}>Apply</button>
+        <button className="clear-btn" onClick={clearFilters} style={{ backgroundColor: "#e74c3c", color: "white" }}>
+          ✖ Clear
+        </button>
         <button className="export-btn" onClick={exportCSV}>
           ⬇ Export CSV
         </button>
@@ -149,6 +207,7 @@ function MilkLogs() {
         <thead>
           <tr>
             <th>Farmer</th>
+            <th>Collector</th>
             <th>Quantity (L)</th>
             <th>Notes</th>
             <th>Status</th>
@@ -159,6 +218,7 @@ function MilkLogs() {
           {logs.map((log) => (
             <tr key={log.id}>
               <td>{log.farmerName || log.farmerId}</td>
+              <td>{log.collectorName || "—"}</td>
               <td>{log.quantity}</td>
               <td>{log.notes || "—"}</td>
               <td

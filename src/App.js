@@ -5,6 +5,7 @@ import { auth } from "./services/firebase";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Farmers from "./pages/Farmers";
+import Collectors from "./pages/Collectors";
 import MilkLogs from "./pages/MilkLogs";
 import Payments from "./pages/Payments";
 import Analytics from "./pages/Analytics";
@@ -67,9 +68,9 @@ function App() {
     <Router>
       {isAuthenticated ? (
         <>
-          <Sidebar 
-            isOpen={isOpen} 
-            setIsOpen={setIsOpen} 
+          <Sidebar
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
             onLogout={handleLogout}
             user={user}
           />
@@ -83,6 +84,11 @@ function App() {
               <Route path="/farmers" element={
                 <ProtectedRoute>
                   <Farmers />
+                </ProtectedRoute>
+              } />
+              <Route path="/collectors" element={
+                <ProtectedRoute>
+                  <Collectors />
                 </ProtectedRoute>
               } />
               <Route path="/milk-logs" element={

@@ -11,7 +11,8 @@ import {
   FaSign,
   FaSignOutAlt,
   FaUser,
-  FaChartLine
+  FaChartLine,
+  FaTruck
 } from "react-icons/fa";
 import "./Sidebar.css";
 import { FaBowlFood } from "react-icons/fa6";
@@ -22,6 +23,7 @@ function Sidebar({ isOpen, setIsOpen, onLogout, user }) {
   const menuItems = [
     { path: "/", name: "Dashboard", icon: <FaHome /> },
     { path: "/farmers", name: "Farmers", icon: <FaUserFriends /> },
+    { path: "/collectors", name: "Collectors", icon: <FaTruck /> },
     { path: "/milk-logs", name: "Milk Logs", icon: <FaTint /> },
     { path: "/payments", name: "Payments", icon: <FaMoneyBillWave /> },
     { path: "/analytics", name: "Analytics", icon: <FaChartLine /> },
