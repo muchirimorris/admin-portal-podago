@@ -148,6 +148,30 @@ function MilkLogs() {
 
   const { min: minDate, max: maxDate } = getDateConstraints();
 
+  // 🔹 Group logs by Month
+  const groupLogsByMonth = (logsList) => {
+    const groups = {};
+    logsList.forEach((log) => {
+      const date = log.date?.toDate ? log.date.toDate() : new Date();
+      const monthYear = format(date, "MMMM yyyy");
+      if (!groups[monthYear]) {
+        groups[monthYear] = [];
+      }
+      groups[monthYear].push(log);
+    });
+    // Sort logs within each group by date desc
+    /*
+    Object.keys(groups).forEach(key => {
+        groups[key].sort((a,b) => b.date.toDate() - a.date.toDate());
+    });
+    */
+    return groups; // Keys are essentially already sorted if we process latest first? 
+    // Actually the logs are already sorted by date desc from Firestore.
+    // So iterating them will preserve order if we just push.
+  };
+
+  const groupedLogs = groupLogsByMonth(logs);
+
   return (
     <div className="milk-logs">
       {/* 🔹 Filters */}
@@ -221,39 +245,48 @@ function MilkLogs() {
       </div>
 
 
-      {/* 🔹 Logs Table */}
-      <table className="logs-table">
-        <thead>
-          <tr>
-            <th>Farmer</th>
-            <th>Collector</th>
-            <th>Quantity (L)</th>
-            <th>Notes</th>
-            <th>Status</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {logs.map((log) => (
-            <tr key={log.id}>
-              <td>{log.farmerName || log.farmerId}</td>
-              <td>{log.collectorName || "—"}</td>
-              <td>{log.quantity}</td>
-              <td>{log.notes || "—"}</td>
-              <td
-                className={log.status === "paid" ? "status-paid" : "status-pending"}
-              >
-                {log.status}
-              </td>
-              <td>
-                {log.date?.toDate
-                  ? format(log.date.toDate(), "MMM dd, yyyy HH:mm")
-                  : "N/A"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* 🔹 Logs Table Grouped by Month */}
+      {Object.keys(groupedLogs).length === 0 ? (
+        <div className="no-data">No logs found for the selected criteria.</div>
+      ) : (
+        Object.keys(groupedLogs).map((month) => (
+          <div key={month} className="month-group">
+            <h3 className="month-header">{month}</h3>
+            <table className="logs-table">
+              <thead>
+                <tr>
+                  <th>Farmer</th>
+                  <th>Collector</th>
+                  <th>Quantity (L)</th>
+                  <th>Notes</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {groupedLogs[month].map((log) => (
+                  <tr key={log.id}>
+                    <td>{log.farmerName || log.farmerId}</td>
+                    <td>{log.collectorName || "—"}</td>
+                    <td>{log.quantity}</td>
+                    <td>{log.notes || "—"}</td>
+                    <td
+                      className={log.status === "paid" ? "status-paid" : "status-pending"}
+                    >
+                      {log.status}
+                    </td>
+                    <td>
+                      {log.date?.toDate
+                        ? format(log.date.toDate(), "MMM dd, yyyy HH:mm")
+                        : "N/A"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))
+      )}
     </div>
   );
 }

@@ -11,6 +11,7 @@ import Payments from "./pages/Payments";
 import Analytics from "./pages/Analytics";
 import Feeds from "./pages/Feeds"; // Add this import
 import Login from "./components/Login";
+import { Toaster } from "react-hot-toast";
 import "./App.css";
 
 function App() {
@@ -65,6 +66,7 @@ function App() {
 
   return (
     <Router>
+      <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
       {isAuthenticated ? (
         <Layout user={user} onLogout={handleLogout}>
           <Routes>

@@ -98,6 +98,20 @@
   box-shadow: var(--shadow-md);
 }
 
+/* Month Grouping */
+.month-group {
+  margin-bottom: 2rem;
+}
+
+.month-header {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding-left: 0.5rem;
+  border-left: 4px solid var(--primary-color);
+}
+
 /* Table Container (Scoped to MilkLogs if class reused, but seems distinct in JS) */
 /* JS uses 'logs-table' directly on table, no wrapper class in JS provided in snippet but widely used pattern */
 .logs-table {

@@ -308,6 +308,20 @@
   color: var(--error-color);
 }
 
+/* Month Grouping */
+.month-group {
+  margin-bottom: 2rem;
+}
+
+.month-header {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding-left: 0.5rem;
+  border-left: 4px solid var(--primary-color);
+}
+
 /* Payment Table */
 .payments-table-container {
   background: var(--bg-surface);
