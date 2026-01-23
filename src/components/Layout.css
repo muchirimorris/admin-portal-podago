@@ -1,30 +1,33 @@
+/* Layout.css */
 .layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: var(--color-bg-light, #f5f7fa);
+  background-color: var(--bg-body);
 }
 
 .layout-body {
   display: flex;
   flex: 1;
-  margin-top: var(--topbar-height, 64px);
+  margin-top: var(--header-height);
   /* Push content below fixed TopBar */
+  position: relative;
 }
 
 /* Main Content Area */
 .main-content {
   flex: 1;
   padding: 1.5rem;
-  transition: margin-left 0.3s ease;
-  margin-left: 0;
-  /* Default (sidebar closed or mobile) */
+  transition: margin-left var(--transition-normal);
   width: 100%;
+
+  /* DEFAULT: Desktop Closed (Mini Sidebar) */
+  margin-left: 70px;
 }
 
+/* Desktop Open */
 .main-content.sidebar-open {
-  margin-left: var(--sidebar-width, 260px);
-  width: calc(100% - var(--sidebar-width, 260px));
+  margin-left: var(--sidebar-width);
 }
 
 .content-wrapper {
@@ -32,9 +35,15 @@
   margin: 0 auto;
 }
 
+/* Mobile Styling */
 @media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+    /* Always 0 on mobile */
+    padding: 1rem;
+  }
+
   .main-content.sidebar-open {
-    margin-left: 0;
-    width: 100%;
+    margin-left: 0 !important;
   }
 }

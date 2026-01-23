@@ -1,234 +1,203 @@
 /* src/pages/MilkLogs.css */
 
 .milk-logs {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  background: #f8fafc;
-  min-height: 100vh;
+  /* padding handled by Layout content-wrapper */
+  background: transparent;
+  min-height: auto;
 }
 
 /* Header */
 .milk-logs h1 {
-  color: #2c3e50;
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: white;
-  padding: 1.5rem 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-left: 4px solid #3498db;
+  /* hidden typically if layout handles titles, or styled similarly */
+  display: none;
 }
 
 /* Filters Section */
 .filters {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
   gap: 1rem;
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
+  background: var(--bg-surface);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-lg);
   margin-bottom: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  align-items: end;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .filters select,
 .filters input {
   padding: 0.75rem 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
-  background: white;
-  transition: all 0.3s ease;
-  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: 0.9rem;
+  background: var(--bg-surface-alt);
+  transition: all var(--transition-fast);
+  min-width: 150px;
+  flex: 1;
 }
 
 .filters select:focus,
 .filters input:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  border-color: var(--primary-color);
+  background: var(--bg-surface);
+  box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
 }
 
 .filters button {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: var(--border-radius-md);
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-fast);
   display: flex;
   align-items: center;
   gap: 0.5rem;
   justify-content: center;
+  white-space: nowrap;
 }
 
-.filters button:first-of-type:not(.export-btn) {
-  background: #3498db;
-  color: white;
+.filters button:first-of-type:not(.export-btn):not(.clear-btn) {
+  background: var(--primary-color);
+  color: var(--text-on-primary);
 }
 
-.filters button:first-of-type:not(.export-btn):hover {
-  background: #2980b9;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+.filters button:first-of-type:not(.export-btn):not(.clear-btn):hover {
+  background: var(--primary-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.clear-btn {
+  background: rgba(220, 38, 38, 0.1) !important;
+  color: var(--error-color) !important;
+  border: 1px solid transparent !important;
+}
+
+.clear-btn:hover {
+  background: var(--error-color) !important;
+  color: white !important;
+  transform: translateY(-1px);
 }
 
 .export-btn {
-  background: linear-gradient(135deg, #27ae60, #219653);
-  color: white;
-  grid-column: span 1;
+  background: var(--secondary-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .export-btn:hover {
-  background: linear-gradient(135deg, #219653, #1e8449);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+  background: #f59e0b;
+  /* Amber 500 */
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
-/* Table Container */
-.logs-table-container {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
+/* Table Container (Scoped to MilkLogs if class reused, but seems distinct in JS) */
+/* JS uses 'logs-table' directly on table, no wrapper class in JS provided in snippet but widely used pattern */
 .logs-table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: var(--bg-surface);
+  border-radius: var(--border-radius-lg);
+  /* Rounded corners for the table itself if not in container */
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  display: table;
+  /* Ensure table display */
 }
 
+/* If there is a container wrapper not shown in snippet, apply styles to that. Assuming direct table usage or simple div wrapper */
+
 .logs-table thead {
-  background: linear-gradient(135deg, #2c3e50, #34495e);
+  background: var(--bg-surface-alt);
 }
 
 .logs-table th {
-  color: white;
-  padding: 1.2rem 1rem;
+  color: var(--text-secondary);
+  padding: 1rem 1.5rem;
   text-align: left;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .logs-table tbody tr {
-  border-bottom: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color var(--transition-fast);
 }
 
 .logs-table tbody tr:hover {
-  background: #f8fafc;
-  transform: translateX(4px);
+  background: var(--bg-surface-alt);
 }
 
 .logs-table td {
-  padding: 1.2rem 1rem;
-  color: #4a5568;
+  padding: 1rem 1.5rem;
+  color: var(--text-primary);
   vertical-align: middle;
+  font-size: 0.875rem;
 }
 
 /* Status Badges */
 .status-paid,
 .status-pending {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
   font-weight: 600;
-  text-transform: capitalize;
-  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   min-width: 80px;
 }
 
 .status-paid {
-  background: #e8f5e8;
-  color: #27ae60;
-  border: 1px solid #27ae60;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .status-pending {
-  background: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffc107;
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--warning-color);
+  border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 /* Quantity Styling */
-.logs-table td:nth-child(2) {
+.logs-table td:nth-child(3) {
   font-weight: 600;
-  color: #2c3e50;
-  font-size: 1.1rem;
+  color: var(--primary-color);
+  font-family: 'Outfit', sans-serif;
+  /* Use heading font for numbers if preferred */
 }
 
 /* Notes Styling */
-.logs-table td:nth-child(3) {
-  max-width: 300px;
-  word-wrap: break-word;
-  color: #64748b;
+.logs-table td:nth-child(4) {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-tertiary);
   font-style: italic;
 }
 
 /* Date Styling */
-.logs-table td:nth-child(5) {
-  color: #718096;
-  font-size: 0.9rem;
-  white-space: nowrap;
+.logs-table td:nth-child(6) {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
 }
 
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 3rem;
-  color: #718096;
-}
-
-.empty-state-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-}
-
-.empty-state-text {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-  color: #4a5568;
-}
-
-.empty-state-subtext {
-  color: #a0aec0;
-  font-size: 0.9rem;
-}
-
-/* Loading State */
-.loading-state {
-  text-align: center;
-  padding: 3rem;
-  color: #718096;
-}
-
-.loading-spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #3498db;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Summary Cards */
+/* Summary Cards (If updated JS includes them) */
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -237,265 +206,67 @@
 }
 
 .summary-card {
-  background: white;
+  background: var(--bg-surface);
   padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
   text-align: center;
-  border-top: 4px solid #3498db;
+  transition: transform var(--transition-fast);
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .summary-card h3 {
-  color: #64748b;
-  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
 }
 
 .summary-card .value {
-  color: #2c3e50;
+  color: var(--text-primary);
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
 }
 
-.summary-card .subtext {
-  color: #718096;
-  font-size: 0.8rem;
-  margin-top: 0.5rem;
+/* Animations */
+.logs-table tbody tr {
+  animation: fadeIn 0.3s ease;
 }
 
-/* Filter Tags */
-.filter-tags {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
-
-.filter-tag {
-  background: #e3f2fd;
-  color: #1976d2;
-  padding: 0.3rem 0.8rem;
-  border-radius: 15px;
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.filter-tag button {
-  background: none;
-  border: none;
-  color: #1976d2;
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 0;
-  margin-left: 0.3rem;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .filters {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .milk-logs {
-    padding: 1rem;
-  }
-  
-  .milk-logs h1 {
-    font-size: 2rem;
-    padding: 1rem;
-    text-align: center;
-    justify-content: center;
-  }
-  
-  .filters {
-    grid-template-columns: 1fr;
-    padding: 1.5rem;
-  }
-  
-  .logs-table-container {
-    overflow-x: auto;
-  }
-  
-  .logs-table {
-    min-width: 800px;
-  }
-  
-  .logs-table th,
-  .logs-table td {
-    padding: 1rem 0.5rem;
-    font-size: 0.9rem;
-  }
-  
-  .summary-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .milk-logs h1 {
-    font-size: 1.8rem;
-  }
-  
-  .summary-cards {
-    grid-template-columns: 1fr;
-  }
-  
-  .filters {
-    padding: 1rem;
-  }
-  
-  .filters button {
-    padding: 1rem;
-  }
-}
-
-/* Animation for table rows */
-@keyframes fadeInUp {
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.logs-table tbody tr {
-  animation: fadeInUp 0.3s ease;
-}
-
-.logs-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
-.logs-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
-.logs-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
-.logs-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
-
-/* Custom scrollbar for table */
-.logs-table-container::-webkit-scrollbar {
-  height: 6px;
-}
-
-.logs-table-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.logs-table-container::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-.logs-table-container::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-/* Print Styles */
-@media print {
-  .milk-logs {
-    padding: 0;
-    background: white;
+/* Responsive */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
   }
-  
-  .milk-logs h1,
-  .filters,
-  .summary-cards {
-    box-shadow: none;
-    border: 1px solid #ddd;
-  }
-  
-  .export-btn {
-    display: none;
-  }
-  
+
   .logs-table {
-    border: 1px solid #ddd;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
-}
 
-/* Success Message */
-.export-success {
-  background: #e8f5e8;
-  color: #27ae60;
-  padding: 1rem;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  border-left: 4px solid #27ae60;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* Date Range Styling */
-.date-range {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.date-range span {
-  color: #64748b;
-  font-weight: 500;
-}
-
-/* Farmer Name Styling */
-.farmer-name {
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-/* Quantity Highlight */
-.highlight-quantity {
-  background: linear-gradient(120deg, #a8e6cf 0%, #a8e6cf 100%);
-  background-repeat: no-repeat;
-  background-size: 100% 0.2em;
-  background-position: 0 88%;
-  transition: background-size 0.3s ease;
-}
-
-/* Hover effects for interactive elements */
-.filters select:hover,
-.filters input:hover {
-  border-color: #3498db;
-}
-
-.logs-table tbody tr {
-  cursor: pointer;
-}
-
-/* Selection state for table rows */
-.logs-table tbody tr.selected {
-  background: #e3f2fd;
-  border-left: 4px solid #3498db;
-}
-
-/* Quick Actions */
-.quick-actions {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
-
-.quick-action-btn {
-  padding: 0.5rem 1rem;
-  border: 2px solid #3498db;
-  background: white;
-  color: #3498db;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-}
-
-.quick-action-btn:hover {
-  background: #3498db;
-  color: white;
-  transform: translateY(-1px);
+  .logs-table th,
+  .logs-table td {
+    padding: 0.75rem 1rem;
+  }
 }

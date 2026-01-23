@@ -1,16 +1,16 @@
 // src/pages/Feeds.js
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  collection, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  doc, 
-  query, 
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  query,
   orderBy,
   onSnapshot,
-  where 
+  where
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import './Feeds.css';
@@ -46,7 +46,7 @@ const Feeds = () => {
   const feedTypes = [
     'Dairy Meal',
     'Pollard (Wheat Pollard)',
-    'Maize Germ', 
+    'Maize Germ',
     'Maize Bran',
     'Wheat Bran',
     'Cottonseed Cake',
@@ -69,7 +69,7 @@ const Feeds = () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'users'));
       const farmersData = {};
-      
+
       querySnapshot.forEach((doc) => {
         const userData = doc.data();
         if (userData.role === 'farmer' && userData.name) {
@@ -80,7 +80,7 @@ const Feeds = () => {
           };
         }
       });
-      
+
       setFarmers(farmersData);
     } catch (error) {
       console.error('Error fetching farmers:', error);
@@ -88,33 +88,32 @@ const Feeds = () => {
     }
   };
 
-  // Fetch feeds from Firestore
-  const setupFeedsListener = () => {
-    const q = query(collection(db, 'feeds'), orderBy('name'));
-    
-    const unsubscribe = onSnapshot(q, 
+  // Fetch farmers only once
+  useEffect(() => {
+    fetchFarmers();
+  }, []);
+
+  // Setup Listeners in a separate useEffect to ensure proper cleanup
+  useEffect(() => {
+    // 1. Feeds Listener
+    const qFeeds = query(collection(db, 'feeds'), orderBy('name'));
+    const unsubscribeFeeds = onSnapshot(qFeeds,
       (snapshot) => {
         const feedsData = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
         setFeeds(feedsData);
-      }, 
+      },
       (error) => {
         console.error('Error fetching feeds:', error);
         showMessage('Error fetching feeds data', 'error');
       }
     );
 
-    unsubscribeRefs.current.feeds = unsubscribe;
-    return unsubscribe;
-  };
-
-  // Fetch feed requests from Firestore
-  const setupRequestsListener = () => {
-    const q = query(collection(db, 'feed_requests'), orderBy('createdAt', 'desc'));
-    
-    const unsubscribe = onSnapshot(q, 
+    // 2. Data Requests Listener
+    const qRequests = query(collection(db, 'feed_requests'), orderBy('createdAt', 'desc'));
+    const unsubscribeRequests = onSnapshot(qRequests,
       (snapshot) => {
         const requestsData = snapshot.docs.map(doc => ({
           id: doc.id,
@@ -122,7 +121,7 @@ const Feeds = () => {
         }));
         setFeedRequests(requestsData);
         setLoading(false);
-      }, 
+      },
       (error) => {
         console.error('Error fetching feed requests:', error);
         showMessage('Error fetching feed requests', 'error');
@@ -130,27 +129,10 @@ const Feeds = () => {
       }
     );
 
-    unsubscribeRefs.current.requests = unsubscribe;
-    return unsubscribe;
-  };
-
-  useEffect(() => {
-    const initializeData = async () => {
-      await fetchFarmers();
-      setupFeedsListener();
-      setupRequestsListener();
-    };
-
-    initializeData();
-
     // Cleanup function
     return () => {
-      Object.values(unsubscribeRefs.current).forEach(unsubscribe => {
-        if (unsubscribe && typeof unsubscribe === 'function') {
-          unsubscribe();
-        }
-      });
-      unsubscribeRefs.current = { feeds: null, requests: null };
+      unsubscribeFeeds();
+      unsubscribeRequests();
     };
   }, []);
 
@@ -181,11 +163,11 @@ const Feeds = () => {
   // Calculate total cost for a feed request
   const calculateFeedCost = (request) => {
     const feed = findMatchingFeed(request);
-    
+
     if (feed && feed.pricePerUnit) {
       return (request.quantity || 0) * feed.pricePerUnit;
     }
-    
+
     // Default prices for all feed types
     const defaultPrices = {
       'dairy_meal': 45, 'Dairy Meal': 45,
@@ -205,21 +187,21 @@ const Feeds = () => {
       'yeast_probiotic_additives': 90, 'Yeast/Probiotic Additives': 90,
       'protein_concentrate': 75, 'Protein Concentrate': 75
     };
-    
+
     const pricePerKg = defaultPrices[request.feedType] || defaultPrices[request.feedTypeName] || 50;
     return (request.quantity || 0) * pricePerKg;
   };
 
   // Calculate totals
   const calculateTotalPendingDeductions = () => {
-    const pendingRequests = feedRequests.filter(request => 
+    const pendingRequests = feedRequests.filter(request =>
       request.status === 'approved' || request.status === 'pending'
     );
     return pendingRequests.reduce((total, request) => total + calculateFeedCost(request), 0);
   };
 
   const calculateTotalDeliveredDeductions = () => {
-    const deliveredRequests = feedRequests.filter(request => 
+    const deliveredRequests = feedRequests.filter(request =>
       request.status === 'delivered'
     );
     return deliveredRequests.reduce((total, request) => total + calculateFeedCost(request), 0);
@@ -263,7 +245,7 @@ const Feeds = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!feedForm.name || !feedForm.type || !feedForm.quantity) {
       showMessage('Please fill in all required fields', 'error');
       return;
@@ -288,13 +270,13 @@ const Feeds = () => {
           const currentReserved = existingFeed.reservedQuantity || 0;
           feedData.availableQuantity = (parseFloat(feedForm.quantity) || 0) - currentReserved;
         }
-        
+
         await updateDoc(doc(db, 'feeds', selectedFeed.id), feedData);
         showMessage('Feed updated successfully');
       } else {
-        await addDoc(collection(db, 'feeds'), { 
-          ...feedData, 
-          createdAt: new Date() 
+        await addDoc(collection(db, 'feeds'), {
+          ...feedData,
+          createdAt: new Date()
         });
         showMessage('Feed added successfully');
       }
@@ -307,7 +289,7 @@ const Feeds = () => {
 
   const deleteFeed = async () => {
     if (!selectedFeed) return;
-    
+
     try {
       await deleteDoc(doc(db, 'feeds', selectedFeed.id));
       showMessage('Feed deleted successfully');
@@ -323,7 +305,7 @@ const Feeds = () => {
   const updateInventoryOnDelivery = async (request) => {
     try {
       const matchingFeed = findMatchingFeed(request);
-      
+
       if (!matchingFeed) {
         throw new Error(`No matching feed found in inventory for: ${request.feedTypeName || request.feedType}`);
       }
@@ -331,17 +313,17 @@ const Feeds = () => {
       const currentQuantity = matchingFeed.quantity || 0;
       const requestedQuantity = request.quantity || 0;
       const currentReserved = matchingFeed.reservedQuantity || 0;
-      
+
       // Check if there's enough stock
       if (currentQuantity < requestedQuantity) {
         throw new Error(`Insufficient stock! Only ${currentQuantity} ${matchingFeed.unit} available, but ${requestedQuantity} ${matchingFeed.unit} requested.`);
       }
-      
+
       // Calculate new quantities
       const newQuantity = currentQuantity - requestedQuantity;
       const newReserved = Math.max(0, currentReserved - requestedQuantity);
       const newAvailable = newQuantity - newReserved;
-      
+
       // Update the feed inventory in Firebase
       await updateDoc(doc(db, 'feeds', matchingFeed.id), {
         quantity: newQuantity,
@@ -355,12 +337,12 @@ const Feeds = () => {
           date: new Date()
         }
       });
-      
+
       console.log(`✅ Inventory updated: ${matchingFeed.name} reduced by ${requestedQuantity} ${matchingFeed.unit}`);
       console.log(`   New quantity: ${newQuantity} ${matchingFeed.unit}`);
       console.log(`   New reserved: ${newReserved} ${matchingFeed.unit}`);
       console.log(`   New available: ${newAvailable} ${matchingFeed.unit}`);
-      
+
       return true;
     } catch (error) {
       console.error('❌ Error updating inventory on delivery:', error);
@@ -372,7 +354,7 @@ const Feeds = () => {
   const restoreInventoryOnRevert = async (request) => {
     try {
       const matchingFeed = findMatchingFeed(request);
-      
+
       if (!matchingFeed) {
         console.warn(`No matching feed found for restoration: ${request.feedTypeName || request.feedType}`);
         return;
@@ -383,7 +365,7 @@ const Feeds = () => {
       const currentReserved = matchingFeed.reservedQuantity || 0;
       const newQuantity = currentQuantity + requestedQuantity;
       const newAvailable = newQuantity - currentReserved;
-      
+
       await updateDoc(doc(db, 'feeds', matchingFeed.id), {
         quantity: newQuantity,
         availableQuantity: newAvailable,
@@ -395,11 +377,11 @@ const Feeds = () => {
           date: new Date()
         }
       });
-      
+
       console.log(`🔄 Inventory restored: ${matchingFeed.name} increased by ${requestedQuantity} ${matchingFeed.unit}`);
       console.log(`   New quantity: ${newQuantity} ${matchingFeed.unit}`);
       console.log(`   New available: ${newAvailable} ${matchingFeed.unit}`);
-      
+
     } catch (error) {
       console.error('❌ Error restoring inventory:', error);
       throw error;
@@ -410,7 +392,7 @@ const Feeds = () => {
   const reserveFeedInInventory = async (request) => {
     try {
       const matchingFeed = findMatchingFeed(request);
-      
+
       if (!matchingFeed) {
         throw new Error(`No matching feed found for reservation: ${request.feedTypeName || request.feedType}`);
       }
@@ -419,26 +401,26 @@ const Feeds = () => {
       const requestedQuantity = request.quantity || 0;
       const currentReserved = matchingFeed.reservedQuantity || 0;
       const currentAvailable = currentQuantity - currentReserved;
-      
+
       // Check if there's enough stock to reserve
       if (currentAvailable < requestedQuantity) {
         throw new Error(`Cannot approve request: Insufficient available stock! Only ${currentAvailable} ${matchingFeed.unit} available, but ${requestedQuantity} ${matchingFeed.unit} requested.`);
       }
-      
+
       // Update the feed to show reserved quantity
       const newReserved = currentReserved + requestedQuantity;
       const newAvailable = currentQuantity - newReserved;
-      
+
       await updateDoc(doc(db, 'feeds', matchingFeed.id), {
         reservedQuantity: newReserved,
         availableQuantity: newAvailable,
         lastUpdated: new Date()
       });
-      
+
       console.log(`🔒 Feed reserved: ${requestedQuantity} ${matchingFeed.unit} of ${matchingFeed.name}`);
       console.log(`   New reserved: ${newReserved} ${matchingFeed.unit}`);
       console.log(`   New available: ${newAvailable} ${matchingFeed.unit}`);
-      
+
     } catch (error) {
       console.error('❌ Error reserving feed:', error);
       throw error;
@@ -449,7 +431,7 @@ const Feeds = () => {
   const releaseReservedFeed = async (request) => {
     try {
       const matchingFeed = findMatchingFeed(request);
-      
+
       if (!matchingFeed) {
         console.warn(`No matching feed found for releasing reservation: ${request.feedTypeName || request.feedType}`);
         return;
@@ -460,17 +442,17 @@ const Feeds = () => {
       const requestedQuantity = request.quantity || 0;
       const newReserved = Math.max(0, currentReserved - requestedQuantity);
       const newAvailable = currentQuantity - newReserved;
-      
+
       await updateDoc(doc(db, 'feeds', matchingFeed.id), {
         reservedQuantity: newReserved,
         availableQuantity: newAvailable,
         lastUpdated: new Date()
       });
-      
+
       console.log(`🔓 Reservation released: ${requestedQuantity} ${matchingFeed.unit} of ${matchingFeed.name}`);
       console.log(`   New reserved: ${newReserved} ${matchingFeed.unit}`);
       console.log(`   New available: ${newAvailable} ${matchingFeed.unit}`);
-      
+
     } catch (error) {
       console.error('❌ Error releasing reserved feed:', error);
       throw error;
@@ -485,9 +467,9 @@ const Feeds = () => {
         where('feedRequestId', '==', request.id),
         where('type', '==', 'feed_deduction')
       );
-      
+
       const existingSnapshot = await getDocs(existingDeductionQuery);
-      
+
       if (existingSnapshot.empty) {
         await addDoc(collection(db, 'payments'), {
           farmerId: request.farmerId,
@@ -500,7 +482,7 @@ const Feeds = () => {
           createdAt: new Date(),
           updatedAt: new Date()
         });
-        
+
         console.log(`💰 Deduction of KES ${cost} created for farmer ${request.farmerId}`);
       }
     } catch (error) {
@@ -517,11 +499,11 @@ const Feeds = () => {
         where('feedRequestId', '==', feedRequestId),
         where('type', '==', 'feed_deduction')
       );
-      
+
       const snapshot = await getDocs(deductionQuery);
       const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
       await Promise.all(deletePromises);
-      
+
       console.log(`🗑️ Deductions removed for request ${feedRequestId}`);
     } catch (error) {
       console.error('❌ Error removing deduction:', error);
@@ -534,16 +516,16 @@ const Feeds = () => {
     try {
       const requestRef = doc(db, 'feed_requests', requestId);
       const request = feedRequests.find(r => r.id === requestId);
-      
+
       if (!request) {
         throw new Error('Request not found');
       }
 
       const feedCost = calculateFeedCost(request);
       const previousStatus = request.status;
-      
+
       console.log(`🔄 Updating request ${requestId} from ${previousStatus} to ${newStatus}`);
-      
+
       // Update request status first
       await updateDoc(requestRef, {
         status: newStatus,
@@ -558,20 +540,20 @@ const Feeds = () => {
             await reserveFeedInInventory(request);
           }
           break;
-          
+
         case 'delivered':
           if (previousStatus !== 'delivered') {
             await updateInventoryOnDelivery(request);
             await createAutomaticDeduction(request, feedCost);
           }
           break;
-          
+
         case 'rejected':
           if (previousStatus === 'approved') {
             await releaseReservedFeed(request);
           }
           break;
-          
+
         case 'pending':
           // When reverting from delivered to pending
           if (previousStatus === 'delivered') {
@@ -583,14 +565,14 @@ const Feeds = () => {
             await releaseReservedFeed(request);
           }
           break;
-          
+
         default:
           break;
       }
 
       showMessage(`Request ${newStatus} successfully`);
       console.log(`✅ Request ${requestId} successfully updated to ${newStatus}`);
-      
+
     } catch (error) {
       console.error('❌ Error updating request:', error);
       showMessage(`Error: ${error.message}`, 'error');
@@ -603,21 +585,21 @@ const Feeds = () => {
     const reserved = feed.reservedQuantity || 0;
     const minStock = feed.minStockLevel || 0;
     const available = quantity - reserved;
-    
-    if (available <= 0) return { 
-      status: 'Out of Stock', 
+
+    if (available <= 0) return {
+      status: 'Out of Stock',
       class: 'out-of-stock',
       available: available,
       reserved: reserved
     };
-    if (available <= minStock) return { 
-      status: 'Low Stock', 
+    if (available <= minStock) return {
+      status: 'Low Stock',
       class: 'low-stock',
       available: available,
       reserved: reserved
     };
-    return { 
-      status: 'In Stock', 
+    return {
+      status: 'In Stock',
       class: 'in-stock',
       available: available,
       reserved: reserved
@@ -682,13 +664,13 @@ const Feeds = () => {
 
       {/* Tabs */}
       <div className="tabs">
-        <button 
+        <button
           className={`tab ${activeTab === 0 ? 'active' : ''}`}
           onClick={() => setActiveTab(0)}
         >
           📦 Feed Inventory ({feeds.length})
         </button>
-        <button 
+        <button
           className={`tab ${activeTab === 1 ? 'active' : ''}`}
           onClick={() => setActiveTab(1)}
         >
@@ -784,13 +766,13 @@ const Feeds = () => {
                       </td>
                       <td>{feed.minStockLevel} {feed.unit}</td>
                       <td>
-                        <button 
+                        <button
                           className="btn btn-edit"
                           onClick={() => openDialog(feed)}
                         >
                           Edit
                         </button>
-                        <button 
+                        <button
                           className="btn btn-delete"
                           onClick={() => {
                             setSelectedFeed(feed);
@@ -863,47 +845,47 @@ const Feeds = () => {
                   const farmerInfo = getFarmerInfo(request.farmerId);
                   const feedCost = calculateFeedCost(request);
                   const matchingFeed = findMatchingFeed(request);
-                  
-                  const unitPrice = matchingFeed?.pricePerUnit || 
-                    (request.feedType === 'dairy_meal' ? 45 : 
-                     request.feedType === 'pollard_wheat_pollard' ? 35 :
-                     request.feedType === 'maize_germ' ? 40 :
-                     request.feedType === 'maize_bran' ? 30 :
-                     request.feedType === 'wheat_bran' ? 32 :
-                     request.feedType === 'cottonseed_cake' ? 55 :
-                     request.feedType === 'sunflower_cake' ? 50 :
-                     request.feedType === 'fish_meal' ? 80 :
-                     request.feedType === 'soybean_meal' ? 65 :
-                     request.feedType === 'molasses' ? 25 :
-                     request.feedType === 'mineral_supplement' ? 70 :
-                     request.feedType === 'salt' ? 15 :
-                     request.feedType === 'lucerne_meal' ? 45 :
-                     request.feedType === 'urea-molasses_block' ? 30 :
-                     request.feedType === 'yeast_probiotic_additives' ? 90 :
-                     request.feedType === 'protein_concentrate' ? 75 : 50);
+
+                  const unitPrice = matchingFeed?.pricePerUnit ||
+                    (request.feedType === 'dairy_meal' ? 45 :
+                      request.feedType === 'pollard_wheat_pollard' ? 35 :
+                        request.feedType === 'maize_germ' ? 40 :
+                          request.feedType === 'maize_bran' ? 30 :
+                            request.feedType === 'wheat_bran' ? 32 :
+                              request.feedType === 'cottonseed_cake' ? 55 :
+                                request.feedType === 'sunflower_cake' ? 50 :
+                                  request.feedType === 'fish_meal' ? 80 :
+                                    request.feedType === 'soybean_meal' ? 65 :
+                                      request.feedType === 'molasses' ? 25 :
+                                        request.feedType === 'mineral_supplement' ? 70 :
+                                          request.feedType === 'salt' ? 15 :
+                                            request.feedType === 'lucerne_meal' ? 45 :
+                                              request.feedType === 'urea-molasses_block' ? 30 :
+                                                request.feedType === 'yeast_probiotic_additives' ? 90 :
+                                                  request.feedType === 'protein_concentrate' ? 75 : 50);
 
                   const getInventoryImpact = () => {
                     if (!matchingFeed) return { text: 'No matching feed', class: 'no-match' };
-                    
+
                     const stockStatus = getStockStatus(matchingFeed);
                     const requestedQty = request.quantity || 0;
-                    
+
                     if (request.status === 'delivered') {
                       return { text: '✅ Inventory updated', class: 'inventory-updated' };
                     }
-                    
+
                     if (request.status === 'approved') {
                       return { text: `🔒 ${requestedQty} ${matchingFeed.unit} reserved`, class: 'reserved' };
                     }
-                    
+
                     if (request.status === 'pending') {
                       const canFulfill = stockStatus.available >= requestedQty;
-                      return { 
-                        text: canFulfill ? `✅ Can fulfill` : `⚠️ Low stock`, 
-                        class: canFulfill ? 'can-fulfill' : 'low-stock-warning' 
+                      return {
+                        text: canFulfill ? `✅ Can fulfill` : `⚠️ Low stock`,
+                        class: canFulfill ? 'can-fulfill' : 'low-stock-warning'
                       };
                     }
-                    
+
                     return { text: 'No impact', class: 'no-impact' };
                   };
 
@@ -950,7 +932,7 @@ const Feeds = () => {
                         {matchingFeed && (
                           <div className="feed-stock-info">
                             Stock: {matchingFeed.quantity} {matchingFeed.unit}
-                            {matchingFeed.reservedQuantity > 0 && 
+                            {matchingFeed.reservedQuantity > 0 &&
                               ` (${matchingFeed.reservedQuantity} reserved)`
                             }
                           </div>
@@ -959,13 +941,13 @@ const Feeds = () => {
                       <td>
                         {request.status === 'pending' && (
                           <div className="action-buttons">
-                            <button 
+                            <button
                               className="btn btn-approve"
                               onClick={() => updateRequestStatus(request.id, 'approved')}
                             >
                               Approve
                             </button>
-                            <button 
+                            <button
                               className="btn btn-reject"
                               onClick={() => updateRequestStatus(request.id, 'rejected')}
                             >
@@ -974,7 +956,7 @@ const Feeds = () => {
                           </div>
                         )}
                         {request.status === 'approved' && (
-                          <button 
+                          <button
                             className="btn btn-deliver"
                             onClick={() => updateRequestStatus(request.id, 'delivered')}
                           >
@@ -982,7 +964,7 @@ const Feeds = () => {
                           </button>
                         )}
                         {(request.status === 'rejected' || request.status === 'delivered') && (
-                          <button 
+                          <button
                             className="btn btn-reset"
                             onClick={() => updateRequestStatus(request.id, 'pending')}
                           >
@@ -1113,8 +1095,8 @@ const Feeds = () => {
             <h2>Confirm Delete</h2>
             <p>Are you sure you want to delete "{selectedFeed?.name}"? This action cannot be undone.</p>
             <div className="modal-actions">
-              <button 
-                className="btn btn-secondary" 
+              <button
+                className="btn btn-secondary"
                 onClick={() => setShowDeleteDialog(false)}
               >
                 Cancel

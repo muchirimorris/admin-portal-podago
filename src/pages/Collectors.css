@@ -8,111 +8,108 @@
 
 /* Header Section */
 .header {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
+  background: var(--bg-surface);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-lg);
   margin-bottom: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-left: 4px solid #2980b9;
-  /* Changed to Blue for Collectors */
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--secondary-color);
+  /* Uses secondary (Amber) distinct from Farmers */
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .header h1 {
-  color: #2c3e50;
-  font-size: 2.2rem;
+  color: var(--text-primary);
+  font-size: 1.5rem;
   font-weight: 700;
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.header p {
-  color: #64748b;
-  font-size: 1.1rem;
-  margin: 0;
-  font-weight: 400;
-}
-
 /* Add Button */
 .add-btn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.2rem;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: var(--border-radius-md);
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: white;
+  background: var(--primary-color);
+  color: var(--text-on-primary);
 }
 
 .add-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
+  background: var(--primary-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
-
 
 /* Table Container */
 .table-container {
-  background: white;
-  border-radius: 12px;
+  background: var(--bg-surface);
+  border-radius: var(--border-radius-lg);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 .farmers-table {
+  /* Reusing same class name as found in JS */
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: var(--bg-surface);
 }
 
 .farmers-table thead {
-  background: linear-gradient(135deg, #2c3e50, #34495e);
+  background: var(--bg-surface-alt);
 }
 
 .farmers-table th {
-  color: white;
-  padding: 1.2rem 1rem;
+  color: var(--text-secondary);
+  padding: 1rem 1.5rem;
   text-align: left;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .farmers-table tbody tr {
-  border-bottom: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color var(--transition-fast);
 }
 
 .farmers-table tbody tr:hover {
-  background: #f8fafc;
-  transform: translateX(4px);
+  background: var(--bg-surface-alt);
 }
 
 .farmers-table td {
-  padding: 1.2rem 1rem;
-  color: #4a5568;
+  padding: 1rem 1.5rem;
+  color: var(--text-primary);
   vertical-align: middle;
+  font-size: 0.875rem;
 }
 
 /* Action Buttons */
 .edit-btn,
 .delete-btn {
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   border: none;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  border-radius: var(--border-radius-md);
+  font-size: 0.8rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-fast);
   margin-right: 0.5rem;
   display: inline-flex;
   align-items: center;
@@ -120,25 +117,25 @@
 }
 
 .edit-btn {
-  background: #3498db;
-  color: white;
+  background: rgba(37, 99, 235, 0.1);
+  /* info color tint */
+  color: var(--info-color);
 }
 
 .edit-btn:hover {
-  background: #2980b9;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
-}
-
-.delete-btn {
-  background: #e74c3c;
+  background: var(--info-color);
   color: white;
 }
 
+.delete-btn {
+  background: rgba(220, 38, 38, 0.1);
+  /* error color tint */
+  color: var(--error-color);
+}
+
 .delete-btn:hover {
-  background: #c0392b;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+  background: var(--error-color);
+  color: white;
 }
 
 /* Modal Overlay */
@@ -148,28 +145,29 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(2px);
 }
 
 .modal {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: var(--bg-surface);
+  padding: 2rem;
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-xl);
   width: 90%;
   max-width: 500px;
-  animation: modalSlideIn 0.3s ease;
+  animation: modalSlideIn 0.3s ease-out;
+  border: 1px solid var(--border-color);
 }
 
 @keyframes modalSlideIn {
   from {
     opacity: 0;
-    transform: translateY(-50px) scale(0.9);
+    transform: translateY(-20px) scale(0.95);
   }
 
   to {
@@ -179,36 +177,38 @@
 }
 
 .modal h2 {
-  color: #2c3e50;
-  font-size: 1.8rem;
+  color: var(--primary-color);
+  font-size: 1.5rem;
   margin-bottom: 1.5rem;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .modal label {
   display: block;
-  margin-bottom: 1.5rem;
-  color: #4a5568;
+  margin-bottom: 1.25rem;
+  color: var(--text-secondary);
   font-weight: 500;
+  font-size: 0.875rem;
 }
 
 .modal input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: 0.95rem;
   margin-top: 0.5rem;
-  transition: all 0.3s ease;
-  background: #f8fafc;
+  transition: all var(--transition-fast);
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
 }
 
 .modal input:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-  background: white;
+  border-color: var(--primary-color);
+  background: var(--bg-surface);
+  box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
 }
 
 .modal-actions {
@@ -220,34 +220,114 @@
 
 .save-btn,
 .cancel-btn {
-  padding: 0.75rem 2rem;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: var(--border-radius-md);
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #27ae60, #219653);
-  color: white;
+  background: var(--primary-color);
+  color: var(--text-on-primary);
 }
 
 .save-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+  background: var(--primary-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .cancel-btn {
-  background: #95a5a6;
-  color: white;
+  background: var(--bg-surface-alt);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
 }
 
 .cancel-btn:hover {
-  background: #7f8c8d;
-  transform: translateY(-2px);
+  background: #e5e7eb;
+  color: var(--text-primary);
+}
+
+/* Activity Modal Specifics */
+.activity-content {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background: var(--bg-surface-alt);
+  padding: 0;
+  overflow: hidden;
+}
+
+.tabs button {
+  transition: all var(--transition-fast);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Animations */
+.farmers-table tbody tr {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar */
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: var(--bg-surface-alt);
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .add-btn {
+    justify-content: center;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .farmers-table th,
+  .farmers-table td {
+    padding: 0.75rem 1rem;
+  }
+
+  .modal {
+    width: 95%;
+    padding: 1.5rem;
+  }
 }

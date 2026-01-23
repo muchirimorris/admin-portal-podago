@@ -492,6 +492,43 @@ function Payments() {
 
   const { min: minDate, max: maxDate } = getDateConstraints();
 
+  // 🔹 Export to CSV
+  const exportCSV = () => {
+    const header = ["Type", "Farmer", "Description", "Amount (KES)", "Status", "Date"];
+    const rows = filteredTransactions.map((t) => {
+      const farmerName = farmers.find(f => f.id === t.farmerId)?.name || t.farmerId;
+      const typeLabel = t.type === 'feed_deduction' ? 'Feed Deduction' : 'Milk Payment';
+      const amount = t.type === 'feed_deduction' ? -Math.abs(t.amount || 0) : (t.amount || 0);
+      const dateStr = t.date?.toDate
+        ? format(t.date.toDate(), "MMM dd, yyyy")
+        : t.createdAt?.toDate
+          ? format(t.createdAt.toDate(), "MMM dd, yyyy")
+          : "N/A";
+
+      return [typeLabel, farmerName, t.description || "", amount, t.status || "pending", dateStr];
+    });
+
+    // Calculate total amount
+    const totalAmount = filteredTransactions.reduce((sum, t) => {
+      const val = t.type === 'feed_deduction' ? -Math.abs(t.amount || 0) : (t.amount || 0);
+      return sum + val;
+    }, 0);
+
+    // Add Total Row
+    const totalRow = ["TOTALS", "", "", totalAmount, "", ""];
+
+    let csvContent =
+      "data:text/csv;charset=utf-8," +
+      [header, ...rows, totalRow].map((row) => row.map(item => `"${item}"`).join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "payments_report.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
+
   return (
     <div className="payments">
 
@@ -649,8 +686,11 @@ function Payments() {
         />
 
         <button onClick={fetchMilkPayments}>Apply</button>
-        <button className="clear-btn" onClick={clearFilters} style={{ backgroundColor: "#e74c3c", color: "white" }}>
+        <button className="clear-btn" onClick={clearFilters}>
           ✖ Clear
+        </button>
+        <button className="export-btn" onClick={exportCSV} style={{ backgroundColor: "#f39c12", color: "white" }}>
+          ⬇ Export CSV
         </button>
       </div>
 

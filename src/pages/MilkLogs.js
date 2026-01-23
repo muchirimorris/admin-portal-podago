@@ -110,9 +110,15 @@ function MilkLogs() {
         : "N/A",
     ]);
 
+    // Calculate total quantity
+    const totalQuantity = logs.reduce((sum, log) => sum + (Number(log.quantity) || 0), 0);
+
+    // Add Total Row
+    const totalRow = ["TOTALS", "", totalQuantity, "", "", ""];
+
     let csvContent =
       "data:text/csv;charset=utf-8," +
-      [header, ...rows].map((row) => row.join(",")).join("\n");
+      [header, ...rows, totalRow].map((row) => row.join(",")).join("\n");
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -199,6 +205,21 @@ function MilkLogs() {
           ⬇ Export CSV
         </button>
       </div>
+
+      {/* 🔹 Totals Summary */}
+      <div className="summary-cards">
+        <div className="summary-card">
+          <h3>🥛 Total Quantity</h3>
+          <p className="value">
+            {logs.reduce((sum, log) => sum + (Number(log.quantity) || 0), 0).toLocaleString()} L
+          </p>
+        </div>
+        <div className="summary-card">
+          <h3>📝 Total Records</h3>
+          <p className="value">{logs.length}</p>
+        </div>
+      </div>
+
 
       {/* 🔹 Logs Table */}
       <table className="logs-table">

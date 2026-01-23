@@ -39,7 +39,7 @@ function Analytics() {
       alert("Please enter a tip!");
       return;
     }
-    
+
     try {
       await addDoc(collection(db, "tips"), {
         content: newTip,
@@ -110,9 +110,9 @@ function Analytics() {
           value={newTip}
           onChange={(e) => setNewTip(e.target.value)}
         />
-        <select 
+        <select
           className="role-select"
-          value={role} 
+          value={role}
           onChange={(e) => setRole(e.target.value)}
         >
           <option value="farmer">For Farmers</option>
@@ -122,7 +122,7 @@ function Analytics() {
           <button className="add-tip-btn" onClick={addTip}>
             Add Tip
           </button>
-          <span style={{color: '#718096', fontSize: '0.9rem'}}>
+          <span className="tip-helper-text">
             Tips will be reviewed before publishing
           </span>
         </div>
@@ -130,19 +130,19 @@ function Analytics() {
 
       {/* Filter Buttons */}
       <div className="filter-buttons">
-        <button 
+        <button
           className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
           onClick={() => setFilter('all')}
         >
           All Tips ({tips.length})
         </button>
-        <button 
+        <button
           className={`filter-btn ${filter === 'approved' ? 'active' : ''}`}
           onClick={() => setFilter('approved')}
         >
           Approved ({tips.filter(t => t.approved).length})
         </button>
-        <button 
+        <button
           className={`filter-btn ${filter === 'pending' ? 'active' : ''}`}
           onClick={() => setFilter('pending')}
         >
@@ -157,8 +157,8 @@ function Analytics() {
             <div className="empty-state-icon">💡</div>
             <p className="empty-state-text">No tips found</p>
             <p className="empty-state-subtext">
-              {filter === 'all' 
-                ? "Be the first to add a helpful tip!" 
+              {filter === 'all'
+                ? "Be the first to add a helpful tip!"
                 : `No ${filter} tips at the moment.`}
             </p>
           </div>
@@ -188,14 +188,14 @@ function Analytics() {
                   </td>
                   <td className="actions-cell">
                     {!t.approved && (
-                      <button 
+                      <button
                         className="action-btn approve-btn"
                         onClick={() => approveTip(t.id)}
                       >
                         Approve
                       </button>
                     )}
-                    <button 
+                    <button
                       className="action-btn delete-btn"
                       onClick={() => deleteTip(t.id)}
                     >

@@ -24,7 +24,6 @@ function Dashboard() {
   const [logs, setLogs] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [filter, setFilter] = useState("week"); // default filter
-  const [timeRange, setTimeRange] = useState("all"); // Added state
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,6 +58,9 @@ function Dashboard() {
           rangeDays = 12;
           startDate = new Date(now.getFullYear(), 0, 1); // Start of year
           break;
+        case "all":
+          startDate = new Date(0); // Beginning of time
+          break;
         default:
           rangeDays = 7;
           startDate.setDate(now.getDate() - 6);
@@ -90,6 +92,9 @@ function Dashboard() {
           } else if (filter === "year") {
             // Group by month for year
             key = logDate.toLocaleDateString("en-US", { month: "short" });
+          } else if (filter === "all") {
+            // Group by Month Year for All Time
+            key = logDate.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
           } else if (filter === "month") {
             // Group by actual date for month view (e.g., "Jan 1", "Jan 2")
             key = logDate.toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -121,6 +126,20 @@ function Dashboard() {
           month: month,
           liters: timeTotals[month] ?? 0
         }));
+      } else if (filter === "all") {
+        // For All Time, we just map the keys that exist, sorted by date logic would be ideal but simple object keys might suffice or we reconstruct
+        // Better: Find min and max date in logs and iterate? Or just use the keys form timeTotals since "All Time" can be sparse.
+        // For simplicity/robustness: Use the keys we collected.
+        chartRange = Object.keys(timeTotals).map(key => ({
+          period: key,
+          liters: timeTotals[key]
+        }));
+        // Sort might be tricky with string keys "Jan 24", "Feb 24". 
+        // Let's settle for just showing what we have or sorting roughly.
+        // A better approach for "all" is usually listing the data points sorted chronologically.
+        // Let's iterate from the first log date to now by month.
+
+        // Simple approach: Use keys.
       } else if (filter === "month") {
         // Generate actual dates for current month (e.g., "Jan 1", "Jan 2", etc.)
         const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
@@ -159,6 +178,7 @@ function Dashboard() {
       case "today": return "Time";
       case "year": return "Month";
       case "month": return "Date";
+      case "all": return "Period";
       default: return "Day";
     }
   };
@@ -169,6 +189,7 @@ function Dashboard() {
       case "today": return "time";
       case "year": return "month";
       case "month": return "date";
+      case "all": return "period";
       default: return "day";
     }
   };
@@ -187,7 +208,8 @@ function Dashboard() {
       today: "📅",
       week: "📊",
       month: "🗓️",
-      year: "📈"
+      year: "📈",
+      all: "♾️"
     };
     return icons[filterType] || "📊";
   };
@@ -196,8 +218,12 @@ function Dashboard() {
     <div className="dashboard-container">
       {/* 🔹 Filters */}
       <div className="filters">
-        <button onClick={() => setTimeRange("all")} className={timeRange === "all" ? "active" : ""}>
-          <FaFilter className="filter-icon" /> All Time
+        <button
+          onClick={() => setFilter("all")}
+          className={filter === "all" ? "active" : ""}
+        >
+          <span className="filter-icon">{getFilterIcon("all")}</span>
+          All Time
         </button>
         <button
           className={filter === "today" ? "active" : ""}
