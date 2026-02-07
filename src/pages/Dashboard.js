@@ -1,7 +1,7 @@
 // src/pages/Dashboard.js
 import React, { useEffect, useState } from "react";
 import { db } from "../services/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import {
   LineChart,
   Line,
@@ -16,14 +16,21 @@ import {
 } from "react-icons/fa";
 import "./Dashboard.css";
 
-function Dashboard() {
+function Dashboard({ user }) {
   const [farmers, setFarmers] = useState(0);
+
   const [collectors, setCollectors] = useState(0);
   const [milkTotal, setMilkTotal] = useState(0);
   const [pendingPayments, setPendingPayments] = useState(0);
   const [logs, setLogs] = useState([]);
+  const [topCollectors, setTopCollectors] = useState([]);
+  const [topFarmers, setTopFarmers] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [filter, setFilter] = useState("week"); // default filter
+
+  const [grossEarnings, setGrossEarnings] = useState(0);
+  const [totalDeductions, setTotalDeductions] = useState(0);
+  const [netEarnings, setNetEarnings] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +42,14 @@ function Dashboard() {
       // ✅ Fetch milk logs
       const logsSnap = await getDocs(collection(db, "milk_logs"));
       const allLogs = logsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+      // ✅ Fetch Feed Deductions
+      const q = query(
+        collection(db, "feed_requests"),
+        where("status", "==", "delivered")
+      );
+      const feedsSnap = await getDocs(q);
+      const allFeeds = feedsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
       // ✅ Date ranges
       const now = new Date();
@@ -68,6 +83,8 @@ function Dashboard() {
 
       let totalMilk = 0;
       let pendingPay = 0;
+      let grossPay = 0;
+      let deductionTotal = 0;
       const pricePerLiter = 45;
       const timeTotals = {};
 
@@ -80,9 +97,10 @@ function Dashboard() {
 
         if (isInRange) {
           totalMilk += log.quantity ?? 0;
+          grossPay += (log.quantity ?? 0) * (log.pricePerLiter || pricePerLiter);
 
           if (log.status === "pending") {
-            pendingPay += (log.quantity ?? 0) * pricePerLiter;
+            pendingPay += (log.quantity ?? 0) * (log.pricePerLiter || pricePerLiter);
           }
 
           let key;
@@ -107,8 +125,21 @@ function Dashboard() {
         }
       });
 
+      // ✅ Processing Deductions
+      allFeeds.forEach((feed) => {
+        const feedDate = feed.updatedAt?.toDate ? feed.updatedAt.toDate() : (feed.createdAt?.toDate ? feed.createdAt.toDate() : new Date());
+
+        // Check if feed is within selected filter range
+        if (feedDate >= startDate && feedDate <= now) {
+          deductionTotal += Math.abs(feed.cost || 0);
+        }
+      });
+
       setMilkTotal(totalMilk);
       setPendingPayments(pendingPay);
+      setGrossEarnings(grossPay);
+      setTotalDeductions(deductionTotal);
+      setNetEarnings(grossPay - deductionTotal);
 
       // ✅ Prepare chart data
       let chartRange = [];
@@ -166,7 +197,40 @@ function Dashboard() {
       setChartData(chartRange);
 
       // ✅ Save last 5 logs for recent activity
-      setLogs(allLogs.slice(-5).reverse());
+      // ✅ Calculate Top Collectors & Farmers
+      const collectorStats = {};
+      const farmerStats = {};
+
+      allLogs.forEach(log => {
+        // Collectors
+        const colName = log.enteredBy || log.collectorName || "Unknown";
+        if (!collectorStats[colName]) {
+          collectorStats[colName] = { name: colName, quantity: 0, count: 0 };
+        }
+        collectorStats[colName].quantity += (log.quantity || 0);
+        collectorStats[colName].count += 1;
+
+        // Farmers
+        const farmName = log.farmerName || log.farmerId || "Unknown";
+        if (!farmerStats[farmName]) {
+          farmerStats[farmName] = { name: farmName, quantity: 0, count: 0 };
+        }
+        farmerStats[farmName].quantity += (log.quantity || 0);
+        farmerStats[farmName].count += 1;
+      });
+
+      // Sort & Slice
+      setTopCollectors(
+        Object.values(collectorStats)
+          .sort((a, b) => b.quantity - a.quantity)
+          .slice(0, 3)
+      );
+
+      setTopFarmers(
+        Object.values(farmerStats)
+          .sort((a, b) => b.quantity - a.quantity)
+          .slice(0, 3)
+      );
     };
 
     fetchData();
@@ -214,8 +278,26 @@ function Dashboard() {
     return icons[filterType] || "📊";
   };
 
+  // Helper to get time of day greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    return "Good Evening";
+  };
+
   return (
     <div className="dashboard-container">
+      {/* 🔹 Welcome Banner */}
+      <div className="welcome-banner">
+        <div className="welcome-text">
+          <h1>{getGreeting()}, {user?.displayName?.split(' ')[0] || 'Admin'}! 👋</h1>
+          <p>Here's what's happening with your cooperative today.</p>
+        </div>
+        <div className="date-badge">
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+        </div>
+      </div>
       {/* 🔹 Filters */}
       <div className="filters">
         <button
@@ -278,10 +360,10 @@ function Dashboard() {
               <Line
                 type="monotone"
                 dataKey="liters"
-                stroke="#0d9488"
+                stroke="#047857" /* Emerald Stroke */
                 strokeWidth={3}
-                dot={{ r: 4 }}
-                activeDot={{ r: 6, stroke: '#0d9488', strokeWidth: 2 }}
+                dot={{ fill: "#047857", r: 4 }}
+                activeDot={{ r: 6 }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -302,9 +384,74 @@ function Dashboard() {
           <h3>🥛 Milk ({filter})</h3>
           <p>{milkTotal} L</p>
         </div>
-        <div className="card">
-          <h3>💰 Pending Payments</h3>
+        <div className="card money income">
+          <h3>💰 Gross Earnings</h3>
+          <p>KES {grossEarnings.toLocaleString()}</p>
+        </div>
+        <div className="card money expense">
+          <h3>🌾 Deductions</h3>
+          <p className="negative">- KES {totalDeductions.toLocaleString()}</p>
+        </div>
+        <div className="card money net">
+          <h3>💵 Net Payable</h3>
+          <p>KES {netEarnings.toLocaleString()}</p>
+        </div>
+        <div className="card money pending">
+          <h3>⏳ Pending Payouts</h3>
           <p>KES {pendingPayments.toLocaleString()}</p>
+        </div>
+      </div>
+
+      {/* ✅ Leaderboard Section */}
+      <div className="leaderboard-grid">
+        {/* Top Farmers */}
+        <div className="leaderboard-cardfarmers">
+          <h2>👨‍🌾 Top Farmers</h2>
+          <div className="collectors-list">
+            {topFarmers.length === 0 ? (
+              <p className="no-data">No data available</p>
+            ) : (
+              topFarmers.map((farmer, index) => (
+                <div key={index} className="collector-card">
+                  <div className={`rank-badge rank-${index + 1}`}>
+                    {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                  </div>
+                  <div className="collector-info">
+                    <h4>{farmer.name}</h4>
+                    <span>{farmer.count} deliveries</span>
+                  </div>
+                  <div className="collector-stat">
+                    <strong>{farmer.quantity} L</strong>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Top Collectors */}
+        <div className="leaderboard-card collectors">
+          <h2>🚛 Top Collectors</h2>
+          <div className="collectors-list">
+            {topCollectors.length === 0 ? (
+              <p className="no-data">No data available</p>
+            ) : (
+              topCollectors.map((collector, index) => (
+                <div key={index} className="collector-card">
+                  <div className={`rank-badge rank-${index + 1}`}>
+                    {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                  </div>
+                  <div className="collector-info">
+                    <h4>{collector.name}</h4>
+                    <span>{collector.count} collections</span>
+                  </div>
+                  <div className="collector-stat">
+                    <strong>{collector.quantity} L</strong>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 

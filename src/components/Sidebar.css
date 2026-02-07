@@ -4,14 +4,16 @@
   top: 0;
   left: 0;
   height: 100vh;
-  background-color: var(--primary-color);
-  color: var(--text-on-primary);
+  background-color: var(--primary-dark);
+  /* Solid Deep Forest */
+  color: var(--text-invert);
   display: flex;
   flex-direction: column;
   z-index: 1000;
   transition: width var(--transition-normal), transform var(--transition-normal);
-  box-shadow: var(--shadow-xl);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
+  /* Softer shadow */
+  border-right: none;
   overflow: hidden;
   white-space: nowrap;
   /* Prevent text wrap during transition */
@@ -35,60 +37,71 @@
   display: flex;
   align-items: center;
   padding: 0 1.5rem;
-  background-color: rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  /* Hide text in mini mode if needed, though JS handles it */
+  background-color: transparent;
+  /* Clean */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .brand-logo {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-on-primary);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: white;
   margin: 0;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
+
+.brand-logo::before {
+  content: "🥬";
+  font-size: 1.25rem;
+}
+
 
 /* Sidebar Navigation */
 .sidebar-nav {
   flex: 1;
-  padding: 1rem 0;
+  padding: 1.5rem 0.75rem;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 0.875rem 1.5rem;
-  color: rgba(255, 255, 255, 0.7);
+  padding: 0.65rem 1rem;
+  margin-bottom: 0.25rem;
+  color: rgba(255, 255, 255, 0.65);
+  /* More muted inactive */
   text-decoration: none;
   transition: all var(--transition-fast);
-  position: relative;
+  border-radius: var(--border-radius-md);
   font-weight: 500;
-  height: 3rem;
-  /* Fixed height for consistency */
+  font-size: 0.9rem;
+  height: 2.75rem;
 }
 
 /* Hover State */
 .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text-on-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+  transform: none;
+  /* Remove cheesy movement */
 }
 
 /* Active State */
 .nav-item.active {
-  background-color: var(--primary-light);
-  color: var(--text-on-primary);
-  border-right: 4px solid var(--accent-color);
+  background-color: var(--primary-color);
+  /* Lighter emerald highlight */
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  backdrop-filter: none;
 }
 
 .nav-item.active .icon {
-  color: var(--accent-color);
+  color: white;
 }
 
 /* Icon Styling */

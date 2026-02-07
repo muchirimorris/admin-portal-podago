@@ -217,7 +217,7 @@ function Collectors() {
     return (
         <div className="collectors-page">
             {/* 🔹 Collectors Section */}
-            <div className="header" style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem' }}>
+            <div className="header-actions">
                 <button className="add-btn" onClick={() => setShowAddCollectorModal(true)}>
                     ➕ Add Collector
                 </button>
@@ -241,9 +241,8 @@ function Collectors() {
                                 <td>{collector.email || "N/A"}</td>
                                 <td>
                                     <button
-                                        className="edit-btn"
+                                        className="edit-btn btn-activity"
                                         onClick={() => handleViewActivity(collector)}
-                                        style={{ backgroundColor: '#3498db', marginRight: '5px' }}
                                     >
                                         📋 Show Activities
                                     </button>
@@ -376,44 +375,30 @@ function Collectors() {
             {/* 🔹 Activity Log Modal */}
             {viewingActivityCollector && (
                 <div className="modal-overlay">
-                    <div className="modal" style={{ maxWidth: '800px', width: '90%' }}>
+                    <div className="modal modal-large">
                         <h2>Activity Log: {viewingActivityCollector.name}</h2>
-                        <div className="tabs" style={{ display: 'flex', gap: '10px', marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+                        <div className="activity-tabs">
                             <button
                                 onClick={() => setActivityTab("milk")}
-                                style={{
-                                    padding: '8px 16px',
-                                    border: 'none',
-                                    backgroundColor: activityTab === 'milk' ? '#2ecc71' : '#f0f0f0',
-                                    color: activityTab === 'milk' ? 'white' : 'black',
-                                    borderRadius: '5px',
-                                    cursor: 'pointer'
-                                }}
+                                className={`tab-button ${activityTab === 'milk' ? 'active' : ''}`}
                             >
                                 🥛 Milk Collected ({activityLogs.length})
                             </button>
                             <button
                                 onClick={() => setActivityTab("farmers")}
-                                style={{
-                                    padding: '8px 16px',
-                                    border: 'none',
-                                    backgroundColor: activityTab === 'farmers' ? '#3498db' : '#f0f0f0',
-                                    color: activityTab === 'farmers' ? 'white' : 'black',
-                                    borderRadius: '5px',
-                                    cursor: 'pointer'
-                                }}
+                                className={`tab-button ${activityTab === 'farmers' ? 'active' : ''}`}
                             >
                                 🧑‍🌾 Farmers Registered ({registeredFarmers.length})
                             </button>
                         </div>
 
-                        <div className="activity-content" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                        <div className="activity-content">
                             {loadingActivity ? (
-                                <p>Loading activity...</p>
+                                <p className="loading-text">Loading activity...</p>
                             ) : (
                                 <>
                                     {activityTab === "milk" && (
-                                        <table className="farmers-table" style={{ width: '100%' }}>
+                                        <table className="farmers-table full-width">
                                             <thead>
                                                 <tr>
                                                     <th>Date</th>
@@ -432,7 +417,7 @@ function Collectors() {
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="3" style={{ textAlign: 'center' }}>No milk collection records found.</td>
+                                                        <td colSpan="3" className="text-center">No milk collection records found.</td>
                                                     </tr>
                                                 )}
                                             </tbody>
@@ -440,7 +425,7 @@ function Collectors() {
                                     )}
 
                                     {activityTab === "farmers" && (
-                                        <table className="farmers-table" style={{ width: '100%' }}>
+                                        <table className="farmers-table full-width">
                                             <thead>
                                                 <tr>
                                                     <th>Joined Date</th>
@@ -459,7 +444,7 @@ function Collectors() {
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="3" style={{ textAlign: 'center' }}>No farmers registered by this collector.</td>
+                                                        <td colSpan="3" className="text-center">No farmers registered by this collector.</td>
                                                     </tr>
                                                 )}
                                             </tbody>
@@ -469,7 +454,7 @@ function Collectors() {
                             )}
                         </div>
 
-                        <div className="modal-actions" style={{ marginTop: '20px' }}>
+                        <div className="modal-actions">
                             <button
                                 className="cancel-btn"
                                 onClick={() => setViewingActivityCollector(null)}

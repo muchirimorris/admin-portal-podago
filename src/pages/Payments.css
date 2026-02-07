@@ -526,3 +526,146 @@
     padding: 0.75rem 1rem;
   }
 }
+
+/* 🔹 MONTHLY SUMMARY GRID (New) */
+.monthly-summary-container {
+  padding: 1rem 0;
+}
+
+.monthly-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.month-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  border-top: 4px solid var(--primary-color);
+}
+
+.month-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-light);
+}
+
+.month-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.month-card-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* Status Pill */
+.status-pill {
+  font-size: 0.7rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-pill.pending {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.status-pill.paid {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+/* Stats */
+.month-card-stats {
+  margin-bottom: 1.5rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.stat-row.total {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed var(--border-color);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.stat-row .val {
+  font-family: 'Inter', monospace;
+  /* Monospaced digits alignment */
+}
+
+/* Actions */
+.month-card-action button {
+  width: 100%;
+  padding: 0.8rem;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s;
+  font-size: 0.9rem;
+}
+
+.month-card:hover .month-card-action button {
+  opacity: 0.9;
+}
+
+/* Back Button */
+.right-header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-back-summary {
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-back-summary:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+.no-data-card {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem;
+  color: var(--text-secondary);
+  background: var(--bg-surface-alt);
+  border-radius: var(--border-radius-lg);
+  border: 1px dashed var(--border-color);
+}

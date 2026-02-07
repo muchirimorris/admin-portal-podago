@@ -14,21 +14,24 @@ import "./MilkLogs.css";
 function MilkLogs() {
   const [logs, setLogs] = useState([]);
   const [farmers, setFarmers] = useState([]);
+  const [collectors, setCollectors] = useState([]); // Added state
   const [selectedFarmer, setSelectedFarmer] = useState("");
+  const [selectedCollector, setSelectedCollector] = useState(""); // Added state
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
 
   // 🔹 Fetch farmers
+  // 🔹 Fetch farmers and collectors
   useEffect(() => {
-    const fetchFarmers = async () => {
-      const snapshot = await getDocs(collection(db, "users"));
-      const farmerList = snapshot.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter((u) => u.role === "farmer");
-      setFarmers(farmerList);
+    const fetchData = async () => {
+      // Fetch Farmers
+      const farmersSnapshot = await getDocs(collection(db, "users"));
+      const users = farmersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setFarmers(users.filter((u) => u.role === "farmer"));
+      setCollectors(users.filter((u) => u.role === "collector"));
     };
-    fetchFarmers();
+    fetchData();
   }, []);
 
   // 🔹 Fetch logs with filters
@@ -38,6 +41,20 @@ function MilkLogs() {
     // 1. Farmer Filter
     if (selectedFarmer) {
       constraints.push(where("farmerId", "==", selectedFarmer));
+    }
+
+    // 2. Collector Filter
+    if (selectedCollector) {
+      // Assuming we filter by collectorName based on how Collectors.js works, 
+      // OR collectorId if widely available. Let's try collectorName to match the dropdown value if we store name.
+      // Actually, let's use the ID for selection state, and find the name? 
+      // Or just verify if logs have collectorId. 
+      // Collectors.js used collectorName. Let's stick to that pattern for safety or check if we can use ID.
+      // "collectorName" is displayed in table.
+      const collector = collectors.find(c => c.id === selectedCollector);
+      if (collector) {
+        constraints.push(where("collectorName", "==", collector.name));
+      }
     }
 
     // 2. Date Filtering (Exclusive Priority: Range > Month/Year > Year)
@@ -86,11 +103,12 @@ function MilkLogs() {
   useEffect(() => {
     fetchLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFarmer, year, month, dateRange]);
+  }, [selectedFarmer, selectedCollector, year, month, dateRange]);
 
   // 🔹 Clear all filters
   const clearFilters = () => {
     setSelectedFarmer("");
+    setSelectedCollector("");
     setYear("");
     setMonth("");
     setDateRange({ start: "", end: "" });
@@ -188,6 +206,18 @@ function MilkLogs() {
           ))}
         </select>
 
+        <select
+          value={selectedCollector}
+          onChange={(e) => setSelectedCollector(e.target.value)}
+        >
+          <option value="">All Collectors</option>
+          {collectors.map((collector) => (
+            <option key={collector.id} value={collector.id}>
+              {collector.name || collector.id}
+            </option>
+          ))}
+        </select>
+
         <input
           type="number"
           placeholder="Year (e.g. 2025)"
@@ -221,11 +251,11 @@ function MilkLogs() {
           onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
         />
 
-        <button onClick={fetchLogs}>Apply</button>
-        <button className="clear-btn" onClick={clearFilters} style={{ backgroundColor: "#e74c3c", color: "white" }}>
+        <button className="btn btn-primary" onClick={fetchLogs}>Apply</button>
+        <button className="btn btn-danger" onClick={clearFilters}>
           ✖ Clear
         </button>
-        <button className="export-btn" onClick={exportCSV}>
+        <button className="btn btn-outline" onClick={exportCSV}>
           ⬇ Export CSV
         </button>
       </div>
