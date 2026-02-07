@@ -427,7 +427,7 @@ function Payments() {
     doc.save(`Payslip_${farmer.name}_${format(new Date(), 'yyyyMMdd')}.pdf`);
   };
 
-  // 🔹 EXPORT CSV
+  // 🔹 EXPORT STANDARD CSV (Detailed Report)
   const exportCSV = () => {
     const header = ["Date", "Farmer", "Type", "Details", "Amount", "Status"];
     const rows = logs.map(l => {
@@ -449,9 +449,53 @@ function Payments() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "payments.csv");
+    link.setAttribute("download", "payments_report.csv");
     document.body.appendChild(link);
     link.click();
+  };
+
+  // 🔹 EXPORT M-PESA CSV (Net Pay Only)
+  const exportMPesaCSV = () => {
+    // 1. Identify Payables
+    const payables = farmers.map(f => {
+      const { netPayable } = calculateFarmerBalance(f.id);
+      return {
+        Phone: f.phone || "MISSING_PHONE",
+        Amount: Math.floor(netPayable), // M-Pesa doesn't like decimals usually
+        Reference: `MilkPay ${month ? format(new Date(year, month - 1), 'MMM') : ''}`,
+        Name: f.name
+      };
+    }).filter(p => p.Amount > 0);
+
+    if (payables.length === 0) {
+      toast.error("No pending payments found.");
+      return;
+    }
+
+    // Check for missing phones
+    const missingPhones = payables.filter(p => p.Phone === "MISSING_PHONE");
+    if (missingPhones.length > 0) {
+      toast.error(`Warning: ${missingPhones.length} farmers have no phone number!`);
+    }
+
+    // 2. Create CSV
+    const header = ["Phone", "Amount", "Reference"]; // Standard B2C Format
+    const rows = payables.map(p => [p.Phone, p.Amount, p.Reference]);
+
+    const csvContent = "data:text/csv;charset=utf-8,"
+      + [header, ...rows].map(e => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `mpesa_bulk_payment_${format(new Date(), 'yyyyMMdd')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+
+    // 3. Prompt to Mark as Paid
+    if (window.confirm("✅ M-Pesa File Downloaded!\n\nOnce you upload this to Safaricom/IntaSend and pay, the farmers will have their money.\n\nDo you want to MARK THESE RECORDS AS PAID in the system now?")) {
+      processAllPayments(); // Re-use the batch processing logic we already have
+    }
   };
 
   // 🔹 MARK AS PAID (Individual)
@@ -560,7 +604,10 @@ function Payments() {
             </select>
             <button onClick={fetchMilkPayments}>Apply Filter</button>
             <button className="clear-btn" onClick={clearFilters}>✖ Clear</button>
-            <button className="export-btn" onClick={exportCSV} style={{ marginLeft: 'auto', background: '#f39c12', color: 'white' }}>⬇ CSV</button>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
+              <button className="export-btn" onClick={exportMPesaCSV} style={{ background: '#27ae60', color: 'white' }}>📲 Export M-Pesa CSV</button>
+              <button className="export-btn" onClick={exportCSV} style={{ background: '#f39c12', color: 'white' }}>⬇ Report CSV</button>
+            </div>
           </div>
 
           {/* Global Financial Summary */}
