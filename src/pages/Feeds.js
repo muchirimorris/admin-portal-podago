@@ -13,6 +13,7 @@ import {
   where
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { sendNotification } from '../services/notificationService'; // NEW
 import './Feeds.css';
 
 const Feeds = () => {
@@ -534,10 +535,14 @@ const Feeds = () => {
       });
 
       // Handle status transitions and inventory updates
+      let notifTitle = "Feed Request Update";
+      let notifBody = `Your feed request status is now: ${newStatus.toUpperCase()}`;
+
       switch (newStatus) {
         case 'approved':
           if (previousStatus !== 'approved') {
             await reserveFeedInInventory(request);
+            notifBody = `Your request for ${request.quantity} ${request.unit || 'units'} of ${request.feedTypeName || 'Feed'} has been APPROVED.`;
           }
           break;
 
@@ -545,6 +550,7 @@ const Feeds = () => {
           if (previousStatus !== 'delivered') {
             await updateInventoryOnDelivery(request);
             await createAutomaticDeduction(request, feedCost);
+            notifBody = `Your feed order has been DELIVERED. A deduction of KES ${feedCost} will be applied to your next payment.`;
           }
           break;
 
@@ -552,6 +558,8 @@ const Feeds = () => {
           if (previousStatus === 'approved') {
             await releaseReservedFeed(request);
           }
+          notifBody = `Your feed request has been REJECTED. Please contact the office for details.`;
+          notifTitle = "Feed Request Rejected";
           break;
 
         case 'pending':
@@ -569,6 +577,8 @@ const Feeds = () => {
         default:
           break;
       }
+
+      await sendNotification(request.farmerId, notifTitle, notifBody, "feed"); // NEW: Send Notification
 
       showMessage(`Request ${newStatus} successfully`);
       console.log(`✅ Request ${requestId} successfully updated to ${newStatus}`);

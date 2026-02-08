@@ -18,6 +18,7 @@ import {
 import { db } from "../services/firebase";
 import { format } from "date-fns";
 import { toast } from "react-hot-toast";
+import { sendNotification } from "../services/notificationService"; // NEW
 import "./Payments.css";
 
 function Payments() {
@@ -30,6 +31,7 @@ function Payments() {
   const [year, setYear] = useState("");
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
   const [viewMode, setViewMode] = useState('summary');
+  const [summaryTab, setSummaryTab] = useState('monthly'); // monthly, yearly, all_time
   const [paymentType, setPaymentType] = useState("all");
   const [isProcessing, setIsProcessing] = useState(false);
   const [pricePerLiter, setPricePerLiter] = useState(45);
@@ -148,7 +150,70 @@ function Payments() {
     return Object.values(summary).sort((a, b) => new Date(b.year, b.monthNum) - new Date(a.year, a.monthNum));
   };
 
+  // 🔹 COMPUTE YEARLY SUMMARIES
+  const computeYearlySummaries = () => {
+    const summary = {};
+    const now = new Date();
+    const currentKey = format(now, 'yyyy');
+    summary[currentKey] = {
+      year: currentKey,
+      gross: 0, deductions: 0, net: 0, paid: 0, pending: 0, count: 0
+    };
+
+    logs.forEach(log => {
+      let date = log.date?.toDate ? log.date.toDate() : (log.date ? new Date(log.date) : new Date());
+      if (isNaN(date.getTime())) date = new Date();
+      const key = format(date, 'yyyy');
+      if (!summary[key]) {
+        summary[key] = {
+          year: key,
+          gross: 0, deductions: 0, net: 0, paid: 0, pending: 0, count: 0
+        };
+      }
+      const val = log.amount !== undefined ? log.amount : ((log.quantity || 0) * (log.pricePerLiter || pricePerLiter));
+      summary[key].gross += val;
+      summary[key].count++;
+      if (log.status === 'paid') summary[key].paid += val; else summary[key].pending += val;
+    });
+
+    deliveredFeeds.forEach(ded => {
+      let date = ded.updatedAt?.toDate ? ded.updatedAt.toDate() : (ded.createdAt?.toDate ? ded.createdAt.toDate() : new Date());
+      const key = format(date, 'yyyy');
+      if (!summary[key]) return;
+      const val = Math.abs(ded.cost || 0);
+      summary[key].deductions += val;
+    });
+
+    Object.values(summary).forEach(item => { item.net = item.gross - item.deductions; });
+    return Object.values(summary).sort((a, b) => b.year.localeCompare(a.year));
+  };
+
+  // 🔹 COMPUTE ALL TIME SUMMARY
+  const computeAllTimeSummary = () => {
+    const summary = {
+      label: "All Time",
+      gross: 0, deductions: 0, net: 0, paid: 0, pending: 0, count: 0
+    };
+
+    logs.forEach(log => {
+      const val = log.amount !== undefined ? log.amount : ((log.quantity || 0) * (log.pricePerLiter || pricePerLiter));
+      summary.gross += val;
+      summary.count++;
+      if (log.status === 'paid') summary.paid += val; else summary.pending += val;
+    });
+
+    deliveredFeeds.forEach(ded => {
+      const val = Math.abs(ded.cost || 0);
+      summary.deductions += val;
+    });
+
+    summary.net = summary.gross - summary.deductions;
+    return summary;
+  };
+
   const monthlySummaries = computeMonthlySummaries();
+  const yearlySummaries = computeYearlySummaries();
+  const allTimeSummary = computeAllTimeSummary();
 
   // 🔹 Handlers
   const openMonthDetails = (summaryItem) => {
@@ -160,7 +225,20 @@ function Payments() {
   const backToSummary = () => {
     setViewMode('summary');
     setMonth("");
+    setYear("");
     fetchMilkPayments();
+  };
+
+  const openYearDetails = (summaryItem) => {
+    setMonth(""); // Clear specific month
+    setYear(summaryItem.year);
+    setViewMode('details');
+  };
+
+  const openAllTimeDetails = () => {
+    setMonth("");
+    setYear(""); // Clear specific year
+    setViewMode('details');
   };
 
   const clearFilters = () => {
@@ -278,6 +356,15 @@ function Payments() {
       if (res.success) {
         await batch.commit();
         toast.success(`Paid KES ${res.net}`);
+
+        // NOTIFICATION
+        await sendNotification(
+          farmerId,
+          "Payment Processed",
+          `We have processed your payment of KES ${res.net.toLocaleString()}. Check your M-Pesa/Bank.`,
+          "payment"
+        );
+
         fetchMilkPayments(); // Refresh
       } else {
         toast.error(res.reason || "Failed");
@@ -322,18 +409,31 @@ function Payments() {
       const batch = writeBatch(db);
       const timestamp = new Date();
       let opCount = 0;
+      const notificationsToSend = []; // Store to send after commit
 
       for (const { farmer } of payables) {
         // We reuse the internal logic but need to be careful with batch reuse
         // processSingleFarmerPaymentInternal logic appends to batch.
 
-        await processSingleFarmerPaymentInternal(farmer, batch, timestamp);
+        const res = await processSingleFarmerPaymentInternal(farmer, batch, timestamp);
+        if (res.success) {
+          notificationsToSend.push({
+            userId: farmer.id,
+            title: "Payment Processed",
+            body: `Your payment of KES ${res.net.toLocaleString()} has been processed for this period.`,
+            type: "payment"
+          });
+        }
         opCount++;
         // Note: processSingleFarmer logic does multiple ops (updates logs + inserts payment). 
         // Realistically we should commit every ~400 ops.
       }
 
       await batch.commit();
+
+      // Send Notifications (Fire and forget)
+      notificationsToSend.forEach(n => sendNotification(n.userId, n.title, n.body, n.type));
+
       toast.success(`Successfully processed ${payables.length} payments!`);
       fetchMilkPayments();
 
@@ -514,8 +614,89 @@ function Payments() {
     try {
       await updateDoc(doc(db, "milk_logs", logId), { status: 'paid', paidDate: new Date() });
       toast.success("Marked as Paid");
+
+      // NOTIFICATION
+      await sendNotification(
+        farmerId,
+        "Payment Update",
+        "A milk record has been marked as PAID manually.",
+        "payment"
+      );
+
       fetchMilkPayments();
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to mark as paid");
+    }
+  };
+
+  // 🔹 CLEAR PENDING DEDUCTIONS (Fix Data Debt)
+  const clearPendingDeductions = async (farmerId) => {
+    // 1. Filter currently 'delivered' (owed) feeds for this farmer
+    // Logic must match 'calculateFarmerBalance' and table view
+    const deductionsToClear = deliveredFeeds.filter(d => {
+      if (d.farmerId !== farmerId) return false;
+      const dDate = d.updatedAt?.toDate ? d.updatedAt.toDate() : (d.createdAt?.toDate ? d.createdAt.toDate() : new Date());
+      // Apply date filter if active
+      if (month && year) {
+        if (dDate.getMonth() + 1 !== parseInt(month)) return false;
+        if (dDate.getFullYear() !== parseInt(year)) return false;
+      }
+      return true;
+    });
+
+    if (deductionsToClear.length === 0) {
+      toast("No pending deductions to clear.");
+      return;
+    }
+
+    const totalAmount = deductionsToClear.reduce((sum, d) => sum + Math.abs(d.cost || 0), 0);
+
+    const confirm = window.confirm(
+      `⚠️ ADMIN ACTION: WAIVE DEDUCTIONS\n\n` +
+      `You are about to mark ${deductionsToClear.length} feed requests as 'DEDUCTED' (Paid) for this farmer.\n` +
+      `Total Value: KES ${totalAmount.toLocaleString()}\n\n` +
+      `Use this ONLY if these items were already paid for offline or are old data errors.\n\n` +
+      `Proceed?`
+    );
+
+    if (!confirm) return;
+
+    setIsProcessing(true);
+    try {
+      const batch = writeBatch(db);
+      const timestamp = new Date();
+
+      deductionsToClear.forEach(deduction => {
+        batch.update(doc(db, "feed_requests", deduction.id), {
+          status: 'deducted',
+          deductedDate: timestamp,
+          clearedByAdmin: true // Audit trail
+        });
+      });
+
+      await batch.commit();
+
+      toast.success(`Cleared ${deductionsToClear.length} deductions totaling KES ${totalAmount.toLocaleString()}`);
+
+      // Update local state by removing them from 'deliveredFeeds' (or refetch)
+      // Refetching is safer to ensure sync
+      fetchDeliveredFeeds();
+
+      // NOTIFICATION
+      await sendNotification(
+        farmerId,
+        "Deductions Updated",
+        `Admin has cleared ${deductionsToClear.length} pending feed deductions from your account.`,
+        "feed"
+      );
+
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to clear deductions");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -542,9 +723,17 @@ function Payments() {
       {/* 🔹 SUMMARY VIEW */}
       {viewMode === 'summary' && (
         <div className="monthly-summary-container">
-          <h2>Monthly Financial Overview</h2>
+          <div className="summary-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2>Financial Overview</h2>
+            <div className="view-tabs">
+              <button className={`tab-btn ${summaryTab === 'monthly' ? 'active' : ''}`} onClick={() => setSummaryTab('monthly')}>Monthly</button>
+              <button className={`tab-btn ${summaryTab === 'yearly' ? 'active' : ''}`} onClick={() => setSummaryTab('yearly')}>Yearly</button>
+              <button className={`tab-btn ${summaryTab === 'all_time' ? 'active' : ''}`} onClick={() => setSummaryTab('all_time')}>All Time</button>
+            </div>
+          </div>
+
           <div className="monthly-grid">
-            {monthlySummaries.map((item, idx) => (
+            {summaryTab === 'monthly' && monthlySummaries.map((item, idx) => (
               <div key={idx} className="month-card" onClick={() => openMonthDetails(item)}>
                 <div className="month-card-header">
                   <h4>{item.month}</h4>
@@ -558,6 +747,37 @@ function Payments() {
                 <div className="month-card-action"><button>View & Process ➜</button></div>
               </div>
             ))}
+
+            {summaryTab === 'yearly' && yearlySummaries.map((item, idx) => (
+              <div key={idx} className="month-card yearly-card" onClick={() => openYearDetails(item)} style={{ borderColor: '#3498db' }}>
+                <div className="month-card-header" style={{ background: '#3498db', color: 'white' }}>
+                  <h4>{item.year}</h4>
+                  <span className={`status-pill ${item.pending > 0 ? 'pending' : 'paid'}`}>{item.pending > 0 ? 'Action Needed' : 'Completed'}</span>
+                </div>
+                <div className="month-card-stats">
+                  <div className="stat-row"><span>🥛 Gross:</span><span className="val positive">KES {item.gross.toLocaleString()}</span></div>
+                  <div className="stat-row"><span>🌾 Deductions:</span><span className="val negative">- KES {item.deductions.toLocaleString()}</span></div>
+                  <div className="stat-row total"><span>💰 Net:</span><span className="val">KES {item.net.toLocaleString()}</span></div>
+                </div>
+                <div className="month-card-action"><button style={{ color: '#3498db' }}>View Year ➜</button></div>
+              </div>
+            ))}
+
+            {summaryTab === 'all_time' && (
+              <div className="month-card all-time-card" onClick={() => openAllTimeDetails()} style={{ borderColor: '#8e44ad', gridColumn: 'span 3' }}>
+                <div className="month-card-header" style={{ background: '#8e44ad', color: 'white' }}>
+                  <h4>All Time History</h4>
+                  <span className="status-pill">{allTimeSummary.count} Transactions</span>
+                </div>
+                <div className="month-card-stats" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                  <div className="stat-row"><h3>🥛 Total Gross</h3><span className="val positive" style={{ fontSize: '1.2rem' }}>KES {allTimeSummary.gross.toLocaleString()}</span></div>
+                  <div className="stat-row"><h3>🌾 Total Deductions</h3><span className="val negative" style={{ fontSize: '1.2rem' }}>- KES {allTimeSummary.deductions.toLocaleString()}</span></div>
+                  <div className="stat-row total"><h3>💰 Net Profit</h3><span className="val" style={{ fontSize: '1.2rem' }}>KES {allTimeSummary.net.toLocaleString()}</span></div>
+                </div>
+                <div className="month-card-action"><button style={{ color: '#8e44ad', width: '100%', marginTop: '10px' }}>View Full History ➜</button></div>
+              </div>
+            )}
+
             {monthlySummaries.length === 0 && <p className="no-data">No data found.</p>}
           </div>
         </div>
@@ -647,6 +867,30 @@ function Payments() {
                     <h3>💰 Net Payable</h3>
                     <div className="amount">KES {totalNet.toLocaleString()}</div>
                   </div>
+
+                  {/* Admin Tools for Deductions */}
+                  {selectedFarmer && totalDeductions > 0 && (
+                    <div style={{ gridColumn: '1 / -1', marginTop: '10px', padding: '10px', background: '#fff3cd', borderRadius: '8px', border: '1px solid #ffeeba', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div>
+                        <strong>⚠️ Data Cleanup:</strong> If these deductions are incorrect or old, you can waive them here.
+                      </div>
+                      <button
+                        onClick={() => clearPendingDeductions(selectedFarmer)}
+                        disabled={isProcessing}
+                        style={{
+                          background: '#e74c3c',
+                          color: 'white',
+                          border: 'none',
+                          padding: '8px 12px',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {isProcessing ? "Processing..." : "🗑️ Clear These Deductions"}
+                      </button>
+                    </div>
+                  )}
                 </>
               )
             })()}

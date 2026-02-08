@@ -669,3 +669,64 @@
   border-radius: var(--border-radius-lg);
   border: 1px dashed var(--border-color);
 }
+
+/* 🔹 NEW: View Tabs */
+.view-tabs {
+  display: flex;
+  background: var(--bg-surface-alt);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  background: white;
+  color: var(--primary-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 🔹 NEW: Yearly & All Time Cards Overrides */
+.yearly-card {
+  border-top-width: 0;
+  border-left: 5px solid #3498db;
+}
+
+.yearly-card .month-card-header {
+  margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+  /* Full bleed header */
+  padding: 1rem 1.5rem;
+  border-top-right-radius: var(--border-radius-lg);
+  /* Top-left handled by border-left? careful with radius */
+}
+
+.all-time-card {
+  border-top-width: 0;
+  border-left: 5px solid #8e44ad;
+}
+
+.all-time-card .month-card-header {
+  margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+  padding: 1rem 1.5rem;
+  border-top-right-radius: var(--border-radius-lg);
+}
+
+.all-time-card .month-card-stats {
+  display: grid;
+  gap: 20px;
+}
