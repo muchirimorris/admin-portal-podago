@@ -222,13 +222,13 @@ function Analytics() {
           </div>
         </div>
 
-        {/* 🚚 Top Collectors (Existing) */}
+        {/* 🚚 Top Collecting Officers */}
         <div className="chart-card wide-card">
           <h3>🚛 Top Collecting Officers</h3>
-          <div className="stats-list">
+          <div className="leaderboard-list">
             {collectorStats.map((stat, i) => (
-              <div key={stat.name} className="stat-item">
-                <div className="stat-rank">#{i + 1}</div>
+              <div key={stat.name} className="leaderboard-item">
+                <div className={`rank rank-${i + 1}`}>{i + 1}</div>
                 <div className="stat-info">
                   <span className="stat-name">{stat.name}</span>
                   <span className="stat-details">{stat.count} collections</span>

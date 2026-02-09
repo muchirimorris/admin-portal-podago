@@ -7,7 +7,8 @@ import {
   FaTint,
   FaMoneyBillWave,
   FaChartLine,
-  FaTruck
+  FaTruck,
+  FaComments
 } from "react-icons/fa";
 import { FaBowlFood } from "react-icons/fa6";
 import "./Sidebar.css";
@@ -23,6 +24,7 @@ function Sidebar({ isOpen, setIsOpen }) {
     { path: "/payments", name: "Payments", icon: <FaMoneyBillWave /> },
     { path: "/analytics", name: "Analytics", icon: <FaChartLine /> },
     { path: "/feeds", name: "Feeds", icon: <FaBowlFood /> },
+    { path: "/messages", name: "Messages", icon: <FaComments /> },
   ];
 
   return (

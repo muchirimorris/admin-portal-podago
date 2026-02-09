@@ -18,7 +18,7 @@ export const sendNotification = async (userId, title, body, type = 'info') => {
             title,
             body,
             type,
-            read: false,
+            isRead: false,
             createdAt: serverTimestamp(),
         });
         console.log("Notification sent with ID: ", notificationRef.id);

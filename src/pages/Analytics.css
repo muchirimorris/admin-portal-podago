@@ -510,3 +510,51 @@
 .tips-table tbody tr {
   animation: slideIn 0.3s ease;
 }
+
+/* --- STATS STYLING (For Collectors in Leaderboard) --- */
+.stat-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+}
+
+.stat-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.stat-details {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.stat-bar-container {
+  flex: 2;
+  height: 8px;
+  background: var(--bg-surface);
+  /* Contrast against alt surface */
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0 1rem;
+}
+
+.stat-bar {
+  height: 100%;
+  background: var(--secondary-color);
+  border-radius: 4px;
+}
+
+.stat-value {
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 80px;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .stat-bar-container {
+    display: none;
+  }
+}

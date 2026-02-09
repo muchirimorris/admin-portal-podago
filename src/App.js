@@ -10,6 +10,7 @@ import MilkLogs from "./pages/MilkLogs";
 import Payments from "./pages/Payments";
 import Analytics from "./pages/Analytics";
 import Feeds from "./pages/Feeds"; // Add this import
+import Messages from "./pages/Messages"; // Add this import
 import Login from "./components/Login";
 import Loading from "./components/Loading";
 import { Toaster } from "react-hot-toast";
@@ -100,6 +101,11 @@ function App() {
             <Route path="/feeds" element={
               <ProtectedRoute>
                 <Feeds />
+              </ProtectedRoute>
+            } />
+            <Route path="/messages" element={
+              <ProtectedRoute>
+                <Messages />
               </ProtectedRoute>
             } />
             <Route path="/login" element={<Navigate to="/" />} />
