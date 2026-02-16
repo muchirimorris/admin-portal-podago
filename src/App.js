@@ -11,6 +11,7 @@ import Payments from "./pages/Payments";
 import Analytics from "./pages/Analytics";
 import Feeds from "./pages/Feeds"; // Add this import
 import Messages from "./pages/Messages"; // Add this import
+import LandingPage from "./pages/LandingPage";
 import Login from "./components/Login";
 import Loading from "./components/Loading";
 import { Toaster } from "react-hot-toast";
@@ -114,8 +115,9 @@ function App() {
         </Layout>
       ) : (
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       )}
     </Router>

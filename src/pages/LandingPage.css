@@ -1,0 +1,750 @@
+/* Modern Vibrant SaaS Theme */
+:root {
+    --primary: #059669;
+    /* Emerald 600 */
+    --primary-dark: #047857;
+    /* Emerald 700 */
+    --primary-light: #D1FAE5;
+    /* Emerald 100 */
+    --accent: #F59E0B;
+    /* Amber 500 */
+    --navy: #1E293B;
+    /* Slate 800 */
+    --text-main: #0F172A;
+    /* Slate 900 */
+    --text-muted: #64748B;
+    /* Slate 500 */
+    --bg-white: #FFFFFF;
+    --bg-wash: #F8FAFC;
+    /* Slate 50 */
+    --gradient-main: linear-gradient(135deg, #059669 0%, #10B981 100%);
+    --gradient-hero-bg: radial-gradient(circle at 80% 0%, rgba(16, 185, 129, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 0% 100%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-float: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    --radius-lg: 20px;
+    --radius-md: 12px;
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --container-width: 1200px;
+}
+
+body {
+    color: var(--text-dark);
+    background-color: var(--bg-off-white);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+    font-family: var(--font-heading);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.landing-page {
+    overflow-x: hidden;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 5%;
+    position: sticky;
+    /* Make sticky so it's always accessible */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--primary);
+    /* Solid dark background for visibility */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.nav-brand {
+    font-size: 1.5rem;
+    font-weight: 800;
+    /* Bolder */
+    color: white;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.btn-login {
+    background: rgba(255, 255, 255, 0.15);
+    /* Slightly more visible bg */
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    /* Stronger border */
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    background: var(--primary-dark);
+    /* Darker green on hover */
+    color: white;
+    border-color: var(--primary-dark);
+}
+
+.btn-download {
+    background: white;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-download:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Hero Section - Clean & Professional */
+.hero {
+    min-height: 70vh;
+    /* Reduced height */
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    position: relative;
+    border-radius: 0;
+    /* Remove curves */
+    clip-path: none;
+    /* Remove any clip paths */
+    overflow: hidden;
+    padding: 6rem 5%;
+}
+
+/* Remove abstract shapes */
+.hero::before,
+.hero::after {
+    display: none;
+}
+
+.hero-content {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    padding-top: 2rem;
+}
+
+/* Hero Title Visibility & Coolness */
+.hero-title {
+    font-size: 4rem;
+    /* Slightly smaller */
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    letter-spacing: -2px;
+    text-shadow: none;
+    /* Remove shadow */
+    /* Visibility Fix */
+}
+
+.hero-title span {
+    display: block;
+    font-weight: 400;
+    font-size: 3.5rem;
+    opacity: 1;
+    /* Increased opacity for visibility */
+    color: var(--secondary);
+    /* Use yellow accent */
+    /* Make it pop */
+    text-shadow: none;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    font-weight: 400;
+    opacity: 0.9;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.hero .btn-login {
+    background: var(--secondary);
+    color: var(--primary);
+    border: none;
+    font-weight: 700;
+    padding: 1.2rem 3.5rem;
+    font-size: 1.1rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.hero .btn-download {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    font-weight: 700;
+    padding: 1.2rem 3.5rem;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.hero .btn-download:hover {
+    background: white;
+    color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+.hero .btn-login:hover {
+    background: white;
+    color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* Section Common Styles */
+.content-section {
+    padding: 6rem 5%;
+}
+
+/* Section Containers */
+.section-container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    /* Content above pattern */
+}
+
+/* About Section - Simple & Clean */
+.content-section.about {
+    padding: 0 5% 6rem;
+    margin-top: 0;
+    /* Remove overlap */
+    position: relative;
+    z-index: 20;
+    background: var(--bg-white);
+    padding-top: 6rem;
+}
+
+.content-section.about .section-container {
+    background: none;
+    backdrop-filter: none;
+    padding: 0;
+    border-radius: 24px;
+    box-shadow: none;
+    border: none;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+}
+
+.content-section.about .section-container:hover {
+    transform: translateY(-5px);
+}
+
+/* Image Styles */
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.about-image img,
+.split-image img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-float);
+    transition: transform 0.4s ease;
+}
+
+.about-image img:hover,
+.split-image img:hover {
+    transform: scale(1.02);
+}
+
+.overview-text {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: var(--text-body);
+    max-width: 900px;
+    margin: 0 auto;
+    line-height: 1.8;
+}
+
+.overview-text p {
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 3rem;
+    background: none;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: initial;
+    /* "Cool" Gradient Text */
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+.section-header::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--secondary);
+    margin: 15px auto 0;
+    border-radius: 0;
+}
+
+/* Stats - Clean Cards */
+.content-section.bg-light {
+    background: var(--bg-light);
+    padding: 6rem 5%;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 2.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-card);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.stat-card::before {
+    display: none;
+    /* Remove gradient line */
+}
+
+.stat-card h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.stat-value {
+    display: block;
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-heading);
+}
+
+.stat-card p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+}
+
+/* Activities - Modern Grid */
+.activities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.activity-item {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    border: 1px solid #e0e0e0;
+    transition: transform 0.3s ease;
+}
+
+.activity-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+}
+
+.activity-icon {
+    font-size: 2rem;
+    margin-right: 1.5rem;
+    background: var(--primary-light);
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--primary);
+}
+
+/* Mission / Vision - Clean Green Block */
+.content-section.bg-dark {
+    background: var(--primary-light);
+    /* Switch to light green bg */
+    color: var(--text-dark);
+    /* Dark text */
+    padding: 8rem 5%;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    /* Create stacking context */
+}
+
+.content-section.bg-dark::before {
+    display: none;
+    /* Remove pattern */
+}
+
+.mission-vision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+}
+
+.mv-card h3 {
+    font-size: 2rem;
+    color: var(--primary-dark);
+    /* Gold for high contrast */
+    margin-bottom: 1.5rem;
+    text-shadow: none;
+}
+
+.mv-card p {
+    font-size: 1.25rem;
+    color: var(--text-body);
+    opacity: 1;
+    /* Full opacity */
+    font-weight: 400;
+    /* Regular weight for readability */
+}
+
+/* Impact Section */
+.split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8rem;
+    padding: 4rem 0;
+}
+
+.section-header-small {
+    font-size: 2rem;
+    color: var(--primary-dark);
+    margin-bottom: 2rem;
+}
+
+.impact-list {
+    list-style: none;
+    padding: 0;
+}
+
+.impact-list li {
+    margin-bottom: 2rem;
+    /* More spacing */
+    padding-left: 2rem;
+    position: relative;
+    font-size: 1.1rem;
+    color: var(--text-body);
+}
+
+.impact-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 10px;
+    height: 10px;
+    background: var(--secondary);
+    border-radius: 50%;
+}
+
+/* Life at Podago - Cross-Fade Slideshow */
+.slideshow-container {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    background: #000;
+}
+
+.slide-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    display: flex;
+    align-items: flex-end;
+}
+
+.slide-item.active {
+    opacity: 1;
+    z-index: 1;
+}
+
+.slide-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.slide-content {
+    position: relative;
+    z-index: 2;
+    padding: 3rem;
+    color: white;
+    max-width: 600px;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.8s ease 0.3s;
+}
+
+.slide-item.active .slide-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.slide-content h4 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    transform: translateY(20px);
+    color: white;
+}
+
+.slide-content p {
+    font-size: 1.2rem;
+    transform: translateY(20px);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.slide-indicators {
+    position: absolute;
+    bottom: 2rem;
+    right: 3rem;
+    z-index: 10;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    background: white;
+    transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+    .slideshow-container {
+        height: 350px;
+    }
+
+    .slide-content {
+        padding: 1.5rem;
+    }
+
+    .slide-content h4 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Final CTA */
+.final-cta {
+    background: var(--primary);
+    padding: 8rem 5%;
+    text-align: center;
+    color: white;
+}
+
+.highlight-text {
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+    max-width: 1000px;
+    margin: 0 auto;
+    line-height: 1.3;
+}
+
+/* Footer */
+.landing-footer {
+    background: var(--primary);
+    color: white;
+    padding: 4rem 5% 2rem;
+    font-family: var(--font-body);
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 3rem;
+    max-width: var(--container-width);
+    margin: 0 auto;
+}
+
+.footer-column h4 {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: var(--secondary);
+}
+
+.footer-column p,
+.footer-column a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.footer-column a:hover {
+    color: var(--secondary);
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .hero-title {
+        font-size: 3.5rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mission-vision-grid,
+    .split-grid {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+    }
+
+    .activities-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        border-radius: 0;
+        min-height: auto;
+        padding: 8rem 5% 6rem;
+    }
+
+    .navbar {
+        position: absolute;
+        background: transparent;
+    }
+
+    /* Ensure navbar links are visible */
+    .nav-brand {
+        color: white;
+    }
+
+    /* Fix Hero Title Size */
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-title span {
+        font-size: 2rem;
+    }
+
+    /* Reset button styles for mobile if needed, but absolute nav usually works on mobile hero too */
+    /* If content pushes down, we revert to white background */
+}
+
+/* Fix for mobile text overlap if the background is white */
+@media (max-width: 768px) {
+
+    /* Force navbar to be sticky white on scroll or just permanent white */
+    .navbar {
+        position: fixed;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-brand {
+        color: var(--primary);
+    }
+
+    .btn-login {
+        background: var(--primary);
+        color: white;
+        border: none;
+    }
+}
