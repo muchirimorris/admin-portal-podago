@@ -7,6 +7,14 @@ import Dashboard from "./pages/Dashboard";
 import Farmers from "./pages/Farmers";
 import Collectors from "./pages/Collectors";
 import MilkLogs from "./pages/MilkLogs";
+import ReceptionQc from "./pages/ReceptionQc";
+import MilkLots from "./pages/MilkLots";
+import Traceability from "./pages/Traceability";
+import ProductionBatches from "./pages/ProductionBatches";
+import BatchQc from "./pages/BatchQc";
+import Inventory from "./pages/Inventory";
+import Dispatch from "./pages/Dispatch";
+import Reports from "./pages/Reports";
 import Payments from "./pages/Payments";
 import Analytics from "./pages/Analytics";
 import Feeds from "./pages/Feeds"; // Add this import
@@ -87,6 +95,46 @@ function App() {
             <Route path="/milk-logs" element={
               <ProtectedRoute>
                 <MilkLogs />
+              </ProtectedRoute>
+            } />
+            <Route path="/reception-qc" element={
+              <ProtectedRoute>
+                <ReceptionQc />
+              </ProtectedRoute>
+            } />
+            <Route path="/milk-lots" element={
+              <ProtectedRoute>
+                <MilkLots />
+              </ProtectedRoute>
+            } />
+            <Route path="/traceability" element={
+              <ProtectedRoute>
+                <Traceability />
+              </ProtectedRoute>
+            } />
+            <Route path="/production-batches" element={
+              <ProtectedRoute>
+                <ProductionBatches />
+              </ProtectedRoute>
+            } />
+            <Route path="/batch-qc" element={
+              <ProtectedRoute>
+                <BatchQc />
+              </ProtectedRoute>
+            } />
+            <Route path="/inventory" element={
+              <ProtectedRoute>
+                <Inventory />
+              </ProtectedRoute>
+            } />
+            <Route path="/dispatch" element={
+              <ProtectedRoute>
+                <Dispatch />
+              </ProtectedRoute>
+            } />
+            <Route path="/reports" element={
+              <ProtectedRoute>
+                <Reports />
               </ProtectedRoute>
             } />
             <Route path="/payments" element={

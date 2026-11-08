@@ -1,0 +1,41 @@
+Completed
+Kept the project React + Firebase web-only.
+Preserved the separate mobile repository boundary.
+Added environment-based Firebase configuration:
+.env.example
+firebase.js
+Refactored milk-log reads into milkLogService.js.
+Added web modules:
+Reception QC
+Milk lots
+Traceability
+Production batches
+Batch QC/release
+Inventory and balances
+Dispatch and cold chain
+Reports
+Added routes and sidebar navigation.
+Added audit events to major new workflows.
+Added transactional protection for inventory balances and batch QC status changes.
+Preserved legacy users, milk_logs, and existing mobile workflows.
+No backend, PostgreSQL, Django, or FastAPI code was introduced.
+No production data was modified or deleted.
+npm run build succeeds. Three pre-existing lint warnings remain.
+After Firebase Rules are provided
+Review the mobile repository’s Rules, indexes, claims, and collection structure.
+Back up current production Rules and Firestore data.
+Reconcile field names between web, mobile, and legacy collections.
+Add or safely merge Rules for:
+Role and site access
+Reception QC
+Milk lots and tank movements
+Production batches and QC release
+Inventory balances and movements
+Dispatch and audit events
+Add required Firestore indexes.
+Add Firebase Emulator tests for allowed and denied operations.
+Test with staging users and real role assignments.
+Verify mobile collection workflows are unaffected.
+Add export generation for accounts integration, excluding payments.
+Deploy gradually and monitor audit logs, rejected writes, and reconciliation totals.
+The new write-enabled pages should not be exposed to production users until Rules are reviewed and deployed safely.

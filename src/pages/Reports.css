@@ -1,0 +1,128 @@
+.reports {
+  color: var(--text-primary);
+}
+
+.reports-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.reports-header h1 {
+  margin: 0.25rem 0;
+}
+
+.reports-header p {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.reports-header button {
+  align-items: center;
+  background: var(--primary-color);
+  border: 0;
+  border-radius: var(--border-radius-md);
+  color: var(--text-on-primary);
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.reports-header button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.eyebrow {
+  color: var(--primary-color) !important;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reports-alert {
+  background: rgba(220, 38, 38, 0.1);
+  border-radius: var(--border-radius-md);
+  color: var(--error-color);
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+}
+
+.reports-cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.reports-cards article,
+.reports-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.reports-cards article {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.25rem;
+}
+
+.reports-cards span,
+.reports-cards small {
+  color: var(--text-secondary);
+}
+
+.reports-cards strong {
+  font-size: 1.7rem;
+}
+
+.reports-panel {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+}
+
+.reports-panel h2 {
+  margin-top: 0;
+}
+
+.status-list {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.status-list div {
+  background: var(--bg-surface-alt);
+  border-radius: var(--border-radius-md);
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem;
+}
+
+.status-list span {
+  color: var(--text-secondary);
+}
+
+.reports-note {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .reports-header,
+  .status-list div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .status-list {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,5 +1,11 @@
 # Getting Started with Create React App
 
+## Firebase web configuration
+
+This repository contains the React web application. The mobile collection app is maintained in a separate repository.
+
+Copy `.env.example` to `.env.local` and provide the Firebase web app configuration values before running the application. Do not commit `.env.local` or Firebase service-account credentials.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

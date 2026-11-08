@@ -1,15 +1,11 @@
 // src/pages/MilkLogs.js
 import React, { useEffect, useState } from "react";
-import {
-  collection,
-  getDocs,
-  orderBy,
-  query,
-  where,
-} from "firebase/firestore";
-import { db } from "../services/firebase";
 import { format } from "date-fns";
 import { FaTimes, FaDownload, FaTint, FaFileAlt } from "react-icons/fa";
+import {
+  fetchMilkLogs,
+  fetchUsersByRole,
+} from "../services/milkLogService";
 import "./MilkLogs.css";
 
 function MilkLogs() {
@@ -26,36 +22,22 @@ function MilkLogs() {
   // 🔹 Fetch farmers and collectors
   useEffect(() => {
     const fetchData = async () => {
-      // Fetch Farmers
-      const farmersSnapshot = await getDocs(collection(db, "users"));
-      const users = farmersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setFarmers(users.filter((u) => u.role === "farmer"));
-      setCollectors(users.filter((u) => u.role === "collector"));
+      const [farmersData, collectorsData] = await Promise.all([
+        fetchUsersByRole("farmer"),
+        fetchUsersByRole("collector"),
+      ]);
+      setFarmers(farmersData);
+      setCollectors(collectorsData);
     };
     fetchData();
   }, []);
 
   // 🔹 Fetch logs with filters
   const fetchLogs = async () => {
-    let constraints = [];
-
-    // 1. Farmer Filter
-    if (selectedFarmer) {
-      constraints.push(where("farmerId", "==", selectedFarmer));
-    }
-
-    // 2. Collector Filter
+    let collectorName;
     if (selectedCollector) {
-      // Assuming we filter by collectorName based on how Collectors.js works, 
-      // OR collectorId if widely available. Let's try collectorName to match the dropdown value if we store name.
-      // Actually, let's use the ID for selection state, and find the name? 
-      // Or just verify if logs have collectorId. 
-      // Collectors.js used collectorName. Let's stick to that pattern for safety or check if we can use ID.
-      // "collectorName" is displayed in table.
-      const collector = collectors.find(c => c.id === selectedCollector);
-      if (collector) {
-        constraints.push(where("collectorName", "==", collector.name));
-      }
+      const collector = collectors.find((item) => item.id === selectedCollector);
+      collectorName = collector?.name;
     }
 
     // 2. Date Filtering (Exclusive Priority: Range > Month/Year > Year)
@@ -79,24 +61,16 @@ function MilkLogs() {
       end = new Date(year, 11, 31, 23, 59, 59, 999);
     }
 
-    // Apply date constraints if calculated
-    if (start && end) {
-      constraints.push(where("date", ">=", start));
-      constraints.push(where("date", "<=", end));
-    }
-
-    // Combine with ordering
-    // Note: Firestore requires the field in 'where' to be the first in 'orderBy'
-    constraints.push(orderBy("date", "desc"));
-
-    const q = query(collection(db, "milk_logs"), ...constraints);
-
     try {
-      const snapshot = await getDocs(q);
-      setLogs(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      const fetchedLogs = await fetchMilkLogs({
+        farmerId: selectedFarmer,
+        collectorName,
+        startDate: start && end ? start : undefined,
+        endDate: start && end ? end : undefined,
+      });
+      setLogs(fetchedLogs);
     } catch (error) {
       console.error("Error fetching logs:", error);
-      // Graceful fallback or alert if index is missing
       alert("Error fetching logs. You may need to create a Firestore index.");
     }
   };

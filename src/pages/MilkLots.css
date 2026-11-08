@@ -1,0 +1,177 @@
+.milk-lots {
+  color: var(--text-primary);
+}
+
+.milk-lots-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.milk-lots-header h1 {
+  margin: 0.25rem 0;
+}
+
+.milk-lots-header p {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.milk-lots-header > svg {
+  color: var(--primary-color);
+  font-size: 2rem;
+}
+
+.eyebrow {
+  color: var(--primary-color) !important;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lot-alert {
+  border-radius: var(--border-radius-md);
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+}
+
+.lot-alert-error {
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--error-color);
+}
+
+.lot-alert-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+}
+
+.milk-lots-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.8fr);
+}
+
+.lot-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+}
+
+.lot-panel h2 {
+  margin-top: 0;
+}
+
+.lot-panel form {
+  display: grid;
+  gap: 1rem;
+}
+
+.lot-form-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lot-panel label,
+.lot-panel legend {
+  color: var(--text-secondary);
+  display: grid;
+  font-size: 0.85rem;
+  font-weight: 600;
+  gap: 0.4rem;
+}
+
+.lot-panel input {
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--text-primary);
+  font: inherit;
+  padding: 0.7rem;
+}
+
+.lot-panel fieldset {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  min-width: 0;
+  padding: 1rem;
+}
+
+.delivery-checklist,
+.lot-list {
+  display: grid;
+  gap: 0.6rem;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.delivery-check {
+  align-items: start;
+  background: var(--bg-surface-alt);
+  border-radius: var(--border-radius-md);
+  display: flex !important;
+  font-weight: 400 !important;
+  padding: 0.65rem;
+}
+
+.delivery-check input {
+  margin-top: 0.2rem;
+}
+
+.delivery-check span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.delivery-check small,
+.lot-item small {
+  color: var(--text-secondary);
+}
+
+.lot-panel button[type="submit"] {
+  align-items: center;
+  background: var(--primary-color);
+  border: 0;
+  border-radius: var(--border-radius-md);
+  color: var(--text-on-primary);
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 0.8rem 1rem;
+}
+
+.lot-panel button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.lot-item {
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.8rem;
+}
+
+.lot-item span {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 900px) {
+  .milk-lots-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .lot-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
